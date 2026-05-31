@@ -4,10 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hospital.entity.AuditLog;
 import com.hospital.repository.AuditLogRepository;
+import com.hospital.security.UserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -18,8 +21,6 @@ import java.lang.reflect.Method;
 @RequiredArgsConstructor
 public class AuditLogAspect {
 
-    private static final String USER_ID_HEADER = "X-User-Id";
-
     private final AuditLogRepository auditLogRepository;
     private final HttpServletRequest request;
     private final ObjectMapper objectMapper;
@@ -27,7 +28,7 @@ public class AuditLogAspect {
     @AfterReturning(pointcut = "@annotation(auditable)", returning = "result")
     public void logAfterReturning(Auditable auditable, Object result) {
         AuditLog auditLog = new AuditLog();
-        auditLog.setUserId(parseUserId(request.getHeader(USER_ID_HEADER)));
+        auditLog.setUserId(getUserIdFromJwt());
         auditLog.setAction(auditable.action());
         auditLog.setEntityType(resolveEntityType(auditable, result));
         auditLog.setEntityId(resolveEntityId(result));
@@ -36,15 +37,12 @@ public class AuditLogAspect {
         auditLogRepository.save(auditLog);
     }
 
-    private Long parseUserId(String rawUserId) {
-        if (rawUserId == null || rawUserId.isBlank()) {
+    private Long getUserIdFromJwt() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof UserPrincipal principal)) {
             return null;
         }
-        try {
-            return Long.valueOf(rawUserId);
-        } catch (NumberFormatException ex) {
-            return null;
-        }
+        return principal.getId();
     }
 
     private String resolveEntityType(Auditable auditable, Object result) {

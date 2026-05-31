@@ -41,14 +41,13 @@ INSERT IGNORE INTO roles (id, role_name, created_at, updated_at) VALUES
 (3, 'NURSE', @now, @now),
 (4, 'CASHIER', @now, @now);
 
--- Plaintext notes for training only: admin/admin123, doctor1/doctor123, doctor2/doctor123, nurse1/nurse123, cashier1/cashier123.
--- Replace password_hash values with BCrypt hashes when Spring Security is implemented.
+-- Training credentials: admin/admin123, doctor1/doctor123, doctor2/doctor123, nurse1/nurse123, cashier1/cashier123.
 INSERT IGNORE INTO users (id, username, password_hash, email, is_active, doctor_id, created_at, updated_at) VALUES
-(1, 'admin', 'admin123', 'admin@hospital.local', b'1', NULL, @now, @now),
-(2, 'doctor1', 'doctor123', 'doctor1@hospital.local', b'1', 1, @now, @now),
-(3, 'doctor2', 'doctor123', 'doctor2@hospital.local', b'1', 2, @now, @now),
-(4, 'nurse1', 'nurse123', 'nurse1@hospital.local', b'1', NULL, @now, @now),
-(5, 'cashier1', 'cashier123', 'cashier1@hospital.local', b'1', NULL, @now, @now);
+(1, 'admin', '$2a$10$C4j99tjEM/GY82xwqqi9cuNE0U4PPWSxrW8dlaiN5P1qQXOQUsZ4i', 'admin@hospital.local', b'1', NULL, @now, @now),
+(2, 'doctor1', '$2a$10$v2f/o/5p8aQouFu.jsZSGOwhf4GwwoveUd6/wJ0XYftgc.dBpmL2K', 'doctor1@hospital.local', b'1', 1, @now, @now),
+(3, 'doctor2', '$2a$10$v2f/o/5p8aQouFu.jsZSGOwhf4GwwoveUd6/wJ0XYftgc.dBpmL2K', 'doctor2@hospital.local', b'1', 2, @now, @now),
+(4, 'nurse1', '$2a$10$QgJMU9tVoguWGmWFf2.iMOPT8Thw2Wc5NkVp/f5eQUtXslVj76KpK', 'nurse1@hospital.local', b'1', NULL, @now, @now),
+(5, 'cashier1', '$2a$10$9S6QNL4JaUUHXEs0jqq9Ku19u5U/62SLT8G/pFTHI1vAMPfoMjqJ.', 'cashier1@hospital.local', b'1', NULL, @now, @now);
 
 INSERT IGNORE INTO user_roles (user_id, role_id) VALUES
 (1, 1),

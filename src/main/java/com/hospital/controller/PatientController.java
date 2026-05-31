@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,27 +30,32 @@ public class PatientController {
     private final PatientService patientService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
     public ResponseEntity<ApiResponse<PatientResponse>> create(@Valid @RequestBody PatientRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok("Patient created successfully", patientService.create(request)));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE')")
     public ResponseEntity<ApiResponse<PatientResponse>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(patientService.getById(id)));
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE')")
     public ResponseEntity<ApiResponse<List<PatientResponse>>> getAll() {
         return ResponseEntity.ok(ApiResponse.ok(patientService.getAll()));
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE')")
     public ResponseEntity<ApiResponse<List<PatientResponse>>> search(@RequestParam String keyword) {
         return ResponseEntity.ok(ApiResponse.ok(patientService.searchByName(keyword)));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
     public ResponseEntity<ApiResponse<PatientResponse>> update(
             @PathVariable Long id,
             @Valid @RequestBody PatientRequest request
@@ -58,6 +64,7 @@ public class PatientController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         patientService.delete(id);
         return ResponseEntity.ok(ApiResponse.ok("Patient deleted successfully", null));

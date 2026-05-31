@@ -8,3 +8,8 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+jwt:
+  secret: "1TqjBNHjKr8M04Xg69FDGxhsS6j0R4rXh6qA4CskXdY="
+  access-token-expiration: 86400000
+  refresh-token-expiration: 604800000
