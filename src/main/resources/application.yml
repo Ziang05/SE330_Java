@@ -1,0 +1,10 @@
+# Shared application configuration and default profile selection.
+spring:
+  application:
+    name: hospital-management-system
+  profiles:
+    active: dev
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

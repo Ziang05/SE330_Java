@@ -1,0 +1,18 @@
+# Local agent files
+.agent/
+
+# Java and Maven
+target/
+*.class
+*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Environment
+.env
+
+# Logs
+*.log
