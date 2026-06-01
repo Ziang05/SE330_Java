@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /** Lab test order and result associated with a medical record. */
@@ -46,4 +47,8 @@ public class LabTest extends BaseEntity {
 
     @Column(name = "test_date")
     private LocalDateTime testDate;
+
+    /** Phí xét nghiệm (VNĐ) – dùng để tính labFee trên Invoice. */
+    @Column(name = "fee", precision = 12, scale = 2)
+    private BigDecimal fee = BigDecimal.ZERO;
 }
