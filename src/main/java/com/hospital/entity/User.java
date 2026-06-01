@@ -27,6 +27,9 @@ public class User extends BaseEntity {
     @Column(name = "email", length = 120)
     private String email;
 
+    @Column(name = "full_name", nullable = false, length = 150)
+    private String fullName;
+
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 

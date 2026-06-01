@@ -161,6 +161,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(80) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     email VARCHAR(120),
+    full_name VARCHAR(150) NOT NULL,
     is_active BIT NOT NULL,
     doctor_id BIGINT,
     created_at DATETIME(6) NOT NULL,
