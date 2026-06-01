@@ -55,3 +55,30 @@ INSERT IGNORE INTO user_roles (user_id, role_id) VALUES
 (3, 2),
 (4, 3),
 (5, 4);
+
+-- ==========================================
+-- TEST DATA CHO MODULE THANH TOÁN (T39-T40)
+-- ==========================================
+INSERT IGNORE INTO patients (id, full_name, dob, gender, cccd, phone, address, insurance_number, created_at, updated_at) VALUES
+(1, 'Test Patient', '1990-01-01', 'MALE', '012345678912', '0999999999', 'HCMC', 'DN123456789', @now, @now);
+
+INSERT IGNORE INTO appointments (id, patient_id, doctor_id, appt_datetime, status, notes, created_at, updated_at) VALUES
+(1, 1, 1, @now, 'COMPLETED', 'Kham tong quat', @now, @now);
+
+INSERT IGNORE INTO medical_records (id, patient_id, doctor_id, appointment_id, diagnosis, visit_date, notes, created_at, updated_at) VALUES
+(1, 1, 1, 1, 'Viem hong hat', DATE(@now), 'Benh nhan co BHYT', @now, @now);
+
+-- Đơn thuốc cho MedicalRecord 1
+INSERT IGNORE INTO prescriptions (id, medical_record_id, doctor_id, issued_date, status, created_at, updated_at) VALUES
+(1, 1, 1, DATE(@now), 'COMPLETED', @now, @now);
+
+-- Thêm 2 loại thuốc vào đơn: Amoxicillin (2500đ) x 20, Paracetamol (1200đ) x 10
+INSERT IGNORE INTO prescription_items (id, prescription_id, medicine_id, quantity, dosage, instructions, unit_price_at_time, created_at, updated_at) VALUES
+(1, 1, 1, 20, '2 vien/ngay', 'Sang 1 chieu 1', 2500.00, @now, @now),
+(2, 1, 4, 10, '1 vien/lan', 'Khi sot', 1200.00, @now, @now);
+
+-- Xét nghiệm cho MedicalRecord 1
+INSERT IGNORE INTO lab_tests (id, medical_record_id, test_type, ordered_by, result, status, test_date, fee, created_at, updated_at) VALUES
+(1, 1, 'Xet nghiem mau sinh hoa', 1, 'Binh thuong', 'COMPLETED', @now, 150000.00, @now, @now),
+(2, 1, 'Sieu am vung co', 1, 'Viem nhe', 'COMPLETED', @now, 80000.00, @now, @now);
+
