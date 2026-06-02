@@ -15,14 +15,27 @@ import com.hospital.repository.MedicalRecordRepository;
 import com.hospital.repository.PrescriptionItemRepository;
 import com.hospital.service.PaymentService;
 import com.hospital.util.InvoiceMapper;
+import com.lowagie.text.Document;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.Color;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -168,5 +181,129 @@ public class PaymentServiceImpl implements PaymentService {
     private MedicalRecord findMedicalRecord(Long id) {
         return medicalRecordRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("MedicalRecord", "id", id));
+    }
+
+    // ── T44: XUẤT HOÁ ĐƠN PDF ────────────────────────────────────────────────────
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] exportInvoiceToPdf(Long invoiceId) {
+        Invoice invoice = findInvoice(invoiceId);
+        InvoiceResponse data = InvoiceMapper.toResponse(invoice);
+        log.info("Exporting invoice PDF: id={}", invoiceId);
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Document doc = new Document(PageSize.A4, 50, 50, 60, 40);
+            PdfWriter.getInstance(doc, out);
+            doc.open();
+
+            buildPdfHeader(doc);
+            buildPdfPatientInfo(doc, data);
+            buildPdfFeeTable(doc, data);
+            buildPdfFooter(doc, data);
+
+            doc.close();
+            return out.toByteArray();
+
+        } catch (Exception e) {
+            throw new BusinessException("Khong the tao file PDF: " + e.getMessage());
+        }
+    }
+
+    /** In tiêu đề bệnh viện ở đầu trang. */
+    private void buildPdfHeader(Document doc) throws Exception {
+        Font hospitalFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, Color.DARK_GRAY);
+        Font subFont      = FontFactory.getFont(FontFactory.HELVETICA, 10, Color.GRAY);
+
+        Paragraph hospital = new Paragraph("HOSPITAL MANAGEMENT SYSTEM", hospitalFont);
+        hospital.setAlignment(Element.ALIGN_CENTER);
+        doc.add(hospital);
+
+        Paragraph sub = new Paragraph("Payment Receipt", subFont);
+        sub.setAlignment(Element.ALIGN_CENTER);
+        doc.add(sub);
+        doc.add(new Paragraph(" "));
+    }
+
+    /** In thông tin bệnh nhân và hóa đơn. */
+    private void buildPdfPatientInfo(Document doc, InvoiceResponse data) throws Exception {
+        Font labelFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Color.BLACK);
+        Font valueFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Color.BLACK);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+        doc.add(createInfoLine("Invoice ID    : ", String.valueOf(data.getId()), labelFont, valueFont));
+        doc.add(createInfoLine("Patient       : ", data.getPatientName(), labelFont, valueFont));
+        doc.add(createInfoLine("Medical Record: ", String.valueOf(data.getMedicalRecordId()), labelFont, valueFont));
+        doc.add(createInfoLine("Status        : ", data.getStatus().name(), labelFont, valueFont));
+        if (data.getPaidAt() != null) {
+            doc.add(createInfoLine("Paid At       : ", data.getPaidAt().format(fmt), labelFont, valueFont));
+        }
+        if (data.getPaymentMethod() != null) {
+            doc.add(createInfoLine("Payment Method: ", data.getPaymentMethod().name(), labelFont, valueFont));
+        }
+        doc.add(new Paragraph(" "));
+    }
+
+    /** Bảng chi tiết phí. */
+    private void buildPdfFeeTable(Document doc, InvoiceResponse data) throws Exception {
+        Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Color.WHITE);
+        Font cellFont   = FontFactory.getFont(FontFactory.HELVETICA, 10, Color.BLACK);
+
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(100);
+        table.setWidths(new float[]{3f, 2f});
+
+        // Header row
+        addTableCell(table, "Fee Type",         headerFont, new Color(30, 60, 114),  true);
+        addTableCell(table, "Amount (VND)",      headerFont, new Color(30, 60, 114),  true);
+
+        // Fee rows
+        addTableCell(table, "Examination Fee",   cellFont,   Color.WHITE,             false);
+        addTableCell(table, data.getExaminationFee().toPlainString(), cellFont, Color.WHITE, false);
+
+        addTableCell(table, "Medicine Fee",      cellFont,   new Color(240,240,240),  false);
+        addTableCell(table, data.getMedicineFee().toPlainString(), cellFont, new Color(240,240,240), false);
+
+        addTableCell(table, "Lab Test Fee",      cellFont,   Color.WHITE,             false);
+        addTableCell(table, data.getLabFee().toPlainString(),      cellFont, Color.WHITE,            false);
+
+        // Subtotal
+        addTableCell(table, "Total Amount",      headerFont, new Color(220,220,220),  false);
+        addTableCell(table, data.getTotalAmount().toPlainString(),  headerFont, new Color(220,220,220), false);
+
+        // Insurance
+        String coverageStr = data.getInsuranceCoverage() != null ? data.getInsuranceCoverage().name() : "NONE";
+        addTableCell(table, "Insurance (" + coverageStr + ")", cellFont, Color.WHITE, false);
+        addTableCell(table, "- " + data.getInsuranceAmount().toPlainString(), cellFont, Color.WHITE, false);
+
+        // Paid amount – highlighted
+        addTableCell(table, "PATIENT PAYS",      headerFont, new Color(30, 60, 114),  true);
+        addTableCell(table, data.getPaidAmount().toPlainString(),   headerFont, new Color(30, 60, 114), true);
+
+        doc.add(table);
+    }
+
+    /** In footer "Thank you" ở cuối. */
+    private void buildPdfFooter(Document doc, InvoiceResponse data) throws Exception {
+        Font footerFont = FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 9, Color.GRAY);
+        doc.add(new Paragraph(" "));
+        Paragraph footer = new Paragraph("Thank you for using our service. - Generated automatically.", footerFont);
+        footer.setAlignment(Element.ALIGN_CENTER);
+        doc.add(footer);
+    }
+
+    private Paragraph createInfoLine(String label, String value, Font labelFont, Font valueFont) {
+        Paragraph p = new Paragraph();
+        p.add(new Phrase(label, labelFont));
+        p.add(new Phrase(value, valueFont));
+        return p;
+    }
+
+    private void addTableCell(PdfPTable table, String text, Font font, Color bgColor, boolean isHeader) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, font));
+        cell.setBackgroundColor(bgColor);
+        cell.setPadding(6);
+        cell.setHorizontalAlignment(isHeader ? Element.ALIGN_CENTER : Element.ALIGN_LEFT);
+        table.addCell(cell);
     }
 }

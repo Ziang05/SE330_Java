@@ -6,7 +6,10 @@ import com.hospital.dto.response.InvoiceResponse;
 import com.hospital.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * REST controller for payment and invoice operations (T39, T40).
+ * REST controller for payment and invoice operations (T39, T40, T44).
  *
  * <p>Endpoints:
  * <pre>
@@ -27,6 +30,7 @@ import java.util.List;
  *   POST /api/v1/invoices/pay                               – T39: xác nhận thanh toán
  *   GET  /api/v1/invoices/{id}                              – lấy chi tiết hóa đơn
  *   GET  /api/v1/invoices/patient/{patientId}               – lịch sử hóa đơn bệnh nhân
+ *   GET  /api/v1/invoices/{id}/export                       – T44: xuất hóa đơn PDF
  * </pre>
  */
 @RestController
@@ -38,7 +42,6 @@ public class PaymentController {
 
     /**
      * T40 – Tạo hóa đơn tự động sau khi bác sĩ kết thúc hồ sơ khám.
-     * Gọi bởi module của Giang (Appointment/MedicalRecord) hoặc gọi thủ công bởi NURSE.
      */
     @PostMapping("/medical-records/{medicalRecordId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR')")
@@ -46,13 +49,12 @@ public class PaymentController {
             @PathVariable Long medicalRecordId
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Tạo hóa đơn thành công",
+                .body(ApiResponse.ok("Tao hoa don thanh cong",
                         paymentService.createInvoiceForMedicalRecord(medicalRecordId)));
     }
 
     /**
      * T39 – Xác nhận thanh toán hóa đơn: PENDING → PAID.
-     * Chỉ NURSE/ADMIN (quầy thu ngân) mới được thực hiện.
      */
     @PostMapping("/pay")
     @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
@@ -60,7 +62,7 @@ public class PaymentController {
             @Valid @RequestBody PaymentRequest request
     ) {
         return ResponseEntity.ok(
-                ApiResponse.ok("Thanh toán thành công", paymentService.processPayment(request)));
+                ApiResponse.ok("Thanh toan thanh cong", paymentService.processPayment(request)));
     }
 
     /** Lấy chi tiết một hóa đơn (để in biên lai, kiểm tra). */
@@ -77,5 +79,22 @@ public class PaymentController {
             @PathVariable Long patientId
     ) {
         return ResponseEntity.ok(ApiResponse.ok(paymentService.getByPatientId(patientId)));
+    }
+
+    /**
+     * T44 – Xuất hóa đơn ra file PDF để in biên lai cho bệnh nhân.
+     * Trả về file .pdf, trình duyệt sẽ tự download.
+     */
+    @GetMapping("/{id}/export")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
+    public ResponseEntity<byte[]> exportPdf(@PathVariable Long id) {
+        byte[] pdfBytes = paymentService.exportInvoiceToPdf(id);
+        String filename = "invoice-" + id + ".pdf";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.attachment().filename(filename).build());
+
+        return ResponseEntity.ok().headers(headers).body(pdfBytes);
     }
 }
