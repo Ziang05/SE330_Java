@@ -53,7 +53,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
                             @Param("to") LocalDateTime to);
 
     /**
-     * Doanh thu gom nhóm theo ngày (dùng cho biểu đồ daily).
+     * T42 – Doanh thu gom nhóm theo ngày (dùng cho biểu đồ daily).
      * Trả về List[date_str, total_paid_amount, visit_count].
      */
     @Query("SELECT FUNCTION('DATE', i.paidAt) AS day, " +
@@ -65,4 +65,14 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
            "ORDER BY day ASC")
     List<Object[]> revenueGroupedByDay(@Param("from") LocalDateTime from,
                                        @Param("to") LocalDateTime to);
+
+    /**
+     * T42 – Tổng số tiền BHYT chi trả trong một khoảng thời gian.
+     * Chỉ tính hóa đơn đã thanh toán (PAID).
+     */
+    @Query("SELECT COALESCE(SUM(i.insuranceAmount), 0) FROM Invoice i " +
+           "WHERE i.status = 'PAID' AND i.paidAt BETWEEN :from AND :to")
+    BigDecimal sumInsuranceBetween(@Param("from") LocalDateTime from,
+                                   @Param("to") LocalDateTime to);
 }
+

@@ -82,3 +82,26 @@ INSERT IGNORE INTO lab_tests (id, medical_record_id, test_type, ordered_by, resu
 (1, 1, 'Xet nghiem mau sinh hoa', 1, 'Binh thuong', 'COMPLETED', @now, 150000.00, @now, @now),
 (2, 1, 'Sieu am vung co', 1, 'Viem nhe', 'COMPLETED', @now, 80000.00, @now, @now);
 
+-- ==========================================
+-- TEST DATA CHO BÁO CÁO DOANH THU (T42)
+-- ==========================================
+-- Bệnh nhân 2 & 3
+INSERT IGNORE INTO patients (id, full_name, dob, gender, phone, created_at, updated_at) VALUES
+(2, 'Nguyen Van B', '1985-05-15', 'MALE', '0988888888', @now, @now),
+(3, 'Tran Thi C', '1992-10-20', 'FEMALE', '0977777777', @now, @now);
+
+-- Hồ sơ khám bệnh 2 & 3 (khám vào hôm qua và hôm kia)
+INSERT IGNORE INTO medical_records (id, patient_id, doctor_id, diagnosis, visit_date, created_at, updated_at) VALUES
+(2, 2, 2, 'Kham dinh ky', DATE(DATE_SUB(@now, INTERVAL 1 DAY)), @now, @now),
+(3, 3, 3, 'Kham tim mach', DATE(DATE_SUB(@now, INTERVAL 2 DAY)), @now, @now);
+
+-- Hóa đơn thanh toán trong 3 ngày liên tiếp (để test biểu đồ doanh thu)
+INSERT IGNORE INTO invoices (id, medical_record_id, patient_id, examination_fee, medicine_fee, lab_fee, total_amount, insurance_coverage, insurance_amount, paid_amount, payment_method, status, paid_at, created_at, updated_at) VALUES
+-- Hóa đơn 1: Hôm nay (thuộc về Patient 1 ở trên), trả 88,400đ
+(1, 1, 1, 150000.00, 62000.00, 230000.00, 442000.00, 'EIGHTY', 353600.00, 88400.00, 'CASH', 'PAID', @now, @now, @now),
+
+-- Hóa đơn 2: Hôm qua, không có BHYT, trả 250,000đ
+(2, 2, 2, 150000.00, 100000.00, 0, 250000.00, 'NONE', 0, 250000.00, 'TRANSFER', 'PAID', DATE_SUB(@now, INTERVAL 1 DAY), @now, @now),
+
+-- Hóa đơn 3: Hôm kia, BHYT 100%, trả 0đ
+(3, 3, 3, 150000.00, 500000.00, 200000.00, 850000.00, 'FULL', 850000.00, 0, 'CASH', 'PAID', DATE_SUB(@now, INTERVAL 2 DAY), @now, @now);
