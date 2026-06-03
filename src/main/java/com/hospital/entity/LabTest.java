@@ -1,14 +1,7 @@
 package com.hospital.entity;
 
 import com.hospital.entity.enums.LabTestStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +9,9 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/** Lab test order and result associated with a medical record. */
+/**
+ * Lab test order and result associated with a medical record.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -48,7 +43,9 @@ public class LabTest extends BaseEntity {
     @Column(name = "test_date")
     private LocalDateTime testDate;
 
-    /** Phí xét nghiệm (VNĐ) – dùng để tính labFee trên Invoice. */
+    /**
+     * Phí xét nghiệm (VNĐ) – dùng để tính labFee trên Invoice.
+     */
     @Column(name = "fee", precision = 12, scale = 2)
     private BigDecimal fee = BigDecimal.ZERO;
 }

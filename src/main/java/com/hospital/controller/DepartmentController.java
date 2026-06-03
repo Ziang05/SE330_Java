@@ -1,10 +1,8 @@
 package com.hospital.controller;
 
 import com.hospital.dto.request.DepartmentRequest;
-import com.hospital.dto.request.DoctorRequest;
 import com.hospital.dto.response.ApiResponse;
 import com.hospital.dto.response.DepartmentResponse;
-import com.hospital.dto.response.DoctorResponse;
 import com.hospital.service.DepartmentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

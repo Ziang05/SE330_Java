@@ -11,7 +11,9 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/** Response DTO for an invoice, returned to client after create or payment. */
+/**
+ * Response DTO for an invoice, returned to client after create or payment.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

@@ -32,10 +32,14 @@ public interface PaymentService {
      */
     InvoiceResponse processPayment(PaymentRequest request);
 
-    /** Lấy chi tiết một hóa đơn theo ID. */
+    /**
+     * Lấy chi tiết một hóa đơn theo ID.
+     */
     InvoiceResponse getById(Long invoiceId);
 
-    /** Lấy toàn bộ hóa đơn của một bệnh nhân (mới nhất trước). */
+    /**
+     * Lấy toàn bộ hóa đơn của một bệnh nhân (mới nhất trước).
+     */
     List<InvoiceResponse> getByPatientId(Long patientId);
 
     /**

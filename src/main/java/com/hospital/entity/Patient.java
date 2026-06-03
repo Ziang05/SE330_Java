@@ -1,18 +1,16 @@
 package com.hospital.entity;
 
 import com.hospital.entity.enums.Gender;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 
-/** Stores patient identity, contact, and insurance profile. */
+/**
+ * Stores patient identity, contact, and insurance profile.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

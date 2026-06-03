@@ -4,7 +4,9 @@ import com.hospital.dto.request.PatientRequest;
 import com.hospital.dto.response.PatientResponse;
 import com.hospital.entity.Patient;
 
-/** Small mapper for the sample Patient module. */
+/**
+ * Small mapper for the sample Patient module.
+ */
 public final class PatientMapper {
 
     private PatientMapper() {

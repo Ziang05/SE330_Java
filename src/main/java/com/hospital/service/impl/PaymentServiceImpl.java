@@ -15,13 +15,8 @@ import com.hospital.repository.MedicalRecordRepository;
 import com.hospital.repository.PrescriptionItemRepository;
 import com.hospital.service.PaymentService;
 import com.hospital.util.InvoiceMapper;
-import com.lowagie.text.Document;
-import com.lowagie.text.Element;
+import com.lowagie.text.*;
 import com.lowagie.text.Font;
-import com.lowagie.text.FontFactory;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
@@ -30,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.Color;
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -55,16 +50,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
-    /** Phí khám bác sĩ cố định (VNĐ). */
+    /**
+     * Phí khám bác sĩ cố định (VNĐ).
+     */
     private static final BigDecimal EXAMINATION_FEE = new BigDecimal("150000");
 
-    /** Tỷ lệ BHYT chi trả (80%). */
+    /**
+     * Tỷ lệ BHYT chi trả (80%).
+     */
     private static final BigDecimal INSURANCE_RATE = new BigDecimal("0.80");
 
-    private final InvoiceRepository          invoiceRepository;
-    private final MedicalRecordRepository    medicalRecordRepository;
+    private final InvoiceRepository invoiceRepository;
+    private final MedicalRecordRepository medicalRecordRepository;
     private final PrescriptionItemRepository prescriptionItemRepository;
-    private final LabTestRepository          labTestRepository;
+    private final LabTestRepository labTestRepository;
 
     // ── T40: AUTO-TẠO HÓA ĐƠN SAU KHI KHÁM XONG ─────────────────────────────────
 
@@ -167,9 +166,9 @@ public class PaymentServiceImpl implements PaymentService {
      */
     private BigDecimal calculateInsuranceAmount(BigDecimal totalAmount, InsuranceCoverage coverage) {
         return switch (coverage) {
-            case FULL    -> totalAmount;
-            case EIGHTY  -> totalAmount.multiply(INSURANCE_RATE).setScale(0, RoundingMode.DOWN);
-            case NONE    -> BigDecimal.ZERO;
+            case FULL -> totalAmount;
+            case EIGHTY -> totalAmount.multiply(INSURANCE_RATE).setScale(0, RoundingMode.DOWN);
+            case NONE -> BigDecimal.ZERO;
         };
     }
 
@@ -210,10 +209,12 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    /** In tiêu đề bệnh viện ở đầu trang. */
+    /**
+     * In tiêu đề bệnh viện ở đầu trang.
+     */
     private void buildPdfHeader(Document doc) throws Exception {
         Font hospitalFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, Color.DARK_GRAY);
-        Font subFont      = FontFactory.getFont(FontFactory.HELVETICA, 10, Color.GRAY);
+        Font subFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Color.GRAY);
 
         Paragraph hospital = new Paragraph("HOSPITAL MANAGEMENT SYSTEM", hospitalFont);
         hospital.setAlignment(Element.ALIGN_CENTER);
@@ -225,7 +226,9 @@ public class PaymentServiceImpl implements PaymentService {
         doc.add(new Paragraph(" "));
     }
 
-    /** In thông tin bệnh nhân và hóa đơn. */
+    /**
+     * In thông tin bệnh nhân và hóa đơn.
+     */
     private void buildPdfPatientInfo(Document doc, InvoiceResponse data) throws Exception {
         Font labelFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Color.BLACK);
         Font valueFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Color.BLACK);
@@ -244,32 +247,34 @@ public class PaymentServiceImpl implements PaymentService {
         doc.add(new Paragraph(" "));
     }
 
-    /** Bảng chi tiết phí. */
+    /**
+     * Bảng chi tiết phí.
+     */
     private void buildPdfFeeTable(Document doc, InvoiceResponse data) throws Exception {
         Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Color.WHITE);
-        Font cellFont   = FontFactory.getFont(FontFactory.HELVETICA, 10, Color.BLACK);
+        Font cellFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Color.BLACK);
 
         PdfPTable table = new PdfPTable(2);
         table.setWidthPercentage(100);
         table.setWidths(new float[]{3f, 2f});
 
         // Header row
-        addTableCell(table, "Fee Type",         headerFont, new Color(30, 60, 114),  true);
-        addTableCell(table, "Amount (VND)",      headerFont, new Color(30, 60, 114),  true);
+        addTableCell(table, "Fee Type", headerFont, new Color(30, 60, 114), true);
+        addTableCell(table, "Amount (VND)", headerFont, new Color(30, 60, 114), true);
 
         // Fee rows
-        addTableCell(table, "Examination Fee",   cellFont,   Color.WHITE,             false);
+        addTableCell(table, "Examination Fee", cellFont, Color.WHITE, false);
         addTableCell(table, data.getExaminationFee().toPlainString(), cellFont, Color.WHITE, false);
 
-        addTableCell(table, "Medicine Fee",      cellFont,   new Color(240,240,240),  false);
-        addTableCell(table, data.getMedicineFee().toPlainString(), cellFont, new Color(240,240,240), false);
+        addTableCell(table, "Medicine Fee", cellFont, new Color(240, 240, 240), false);
+        addTableCell(table, data.getMedicineFee().toPlainString(), cellFont, new Color(240, 240, 240), false);
 
-        addTableCell(table, "Lab Test Fee",      cellFont,   Color.WHITE,             false);
-        addTableCell(table, data.getLabFee().toPlainString(),      cellFont, Color.WHITE,            false);
+        addTableCell(table, "Lab Test Fee", cellFont, Color.WHITE, false);
+        addTableCell(table, data.getLabFee().toPlainString(), cellFont, Color.WHITE, false);
 
         // Subtotal
-        addTableCell(table, "Total Amount",      headerFont, new Color(220,220,220),  false);
-        addTableCell(table, data.getTotalAmount().toPlainString(),  headerFont, new Color(220,220,220), false);
+        addTableCell(table, "Total Amount", headerFont, new Color(220, 220, 220), false);
+        addTableCell(table, data.getTotalAmount().toPlainString(), headerFont, new Color(220, 220, 220), false);
 
         // Insurance
         String coverageStr = data.getInsuranceCoverage() != null ? data.getInsuranceCoverage().name() : "NONE";
@@ -277,13 +282,15 @@ public class PaymentServiceImpl implements PaymentService {
         addTableCell(table, "- " + data.getInsuranceAmount().toPlainString(), cellFont, Color.WHITE, false);
 
         // Paid amount – highlighted
-        addTableCell(table, "PATIENT PAYS",      headerFont, new Color(30, 60, 114),  true);
-        addTableCell(table, data.getPaidAmount().toPlainString(),   headerFont, new Color(30, 60, 114), true);
+        addTableCell(table, "PATIENT PAYS", headerFont, new Color(30, 60, 114), true);
+        addTableCell(table, data.getPaidAmount().toPlainString(), headerFont, new Color(30, 60, 114), true);
 
         doc.add(table);
     }
 
-    /** In footer "Thank you" ở cuối. */
+    /**
+     * In footer "Thank you" ở cuối.
+     */
     private void buildPdfFooter(Document doc, InvoiceResponse data) throws Exception {
         Font footerFont = FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 9, Color.GRAY);
         doc.add(new Paragraph(" "));

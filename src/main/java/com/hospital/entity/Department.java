@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Hospital department such as Internal Medicine or Pediatrics. */
+/**
+ * Hospital department such as Internal Medicine or Pediatrics.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

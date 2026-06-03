@@ -7,7 +7,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/** Standard API envelope returned by controllers and exception handlers. */
+/**
+ * Standard API envelope returned by controllers and exception handlers.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

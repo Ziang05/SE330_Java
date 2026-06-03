@@ -6,18 +6,9 @@ import com.hospital.dto.response.InvoiceResponse;
 import com.hospital.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -65,14 +56,18 @@ public class PaymentController {
                 ApiResponse.ok("Thanh toan thanh cong", paymentService.processPayment(request)));
     }
 
-    /** Lấy chi tiết một hóa đơn (để in biên lai, kiểm tra). */
+    /**
+     * Lấy chi tiết một hóa đơn (để in biên lai, kiểm tra).
+     */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR')")
     public ResponseEntity<ApiResponse<InvoiceResponse>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(paymentService.getById(id)));
     }
 
-    /** Lịch sử thanh toán của một bệnh nhân (mới nhất trước). */
+    /**
+     * Lịch sử thanh toán của một bệnh nhân (mới nhất trước).
+     */
     @GetMapping("/patient/{patientId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR')")
     public ResponseEntity<ApiResponse<List<InvoiceResponse>>> getByPatient(

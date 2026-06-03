@@ -16,18 +16,28 @@ import java.util.List;
  */
 public interface MedicineRepository extends JpaRepository<Medicine, Long> {
 
-    /** Tìm thuốc theo tên (không phân biệt hoa thường). */
+    /**
+     * Tìm thuốc theo tên (không phân biệt hoa thường).
+     */
     List<Medicine> findByMedicineNameContainingIgnoreCase(String medicineName);
 
-    /** Lọc theo nhóm thuốc. */
+    /**
+     * Lọc theo nhóm thuốc.
+     */
     List<Medicine> findByCategory(String category);
 
-    /** Lấy danh sách thuốc đang hoạt động (active = true). */
+    /**
+     * Lấy danh sách thuốc đang hoạt động (active = true).
+     */
     List<Medicine> findByActiveTrue();
 
-    /** Lấy danh sách thuốc thuộc danh mục BHYT. */
+    /**
+     * Lấy danh sách thuốc thuộc danh mục BHYT.
+     */
     List<Medicine> findByInsuranceCoveredTrueAndActiveTrue();
 
-    /** Kiểm tra tên thuốc đã tồn tại chưa (dùng khi thêm mới). */
+    /**
+     * Kiểm tra tên thuốc đã tồn tại chưa (dùng khi thêm mới).
+     */
     boolean existsByMedicineNameIgnoreCase(String medicineName);
 }

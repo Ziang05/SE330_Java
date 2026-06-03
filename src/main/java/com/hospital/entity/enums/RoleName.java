@@ -1,6 +1,8 @@
 package com.hospital.entity.enums;
 
-/** Application roles; Spring Security will be wired later. */
+/**
+ * Application roles; Spring Security will be wired later.
+ */
 public enum RoleName {
     ADMIN,
     DOCTOR,

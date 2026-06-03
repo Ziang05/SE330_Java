@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Converts application exceptions into a consistent ApiResponse format. */
+/**
+ * Converts application exceptions into a consistent ApiResponse format.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

@@ -11,7 +11,6 @@ import com.hospital.util.DepartmentMapper;
 import jakarta.annotation.Nonnull;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
 

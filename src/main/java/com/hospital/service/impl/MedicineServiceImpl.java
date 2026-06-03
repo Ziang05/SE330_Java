@@ -16,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/** Implementation of MedicineService – CRUD logic for the medicine catalog (T41). */
+/**
+ * Implementation of MedicineService – CRUD logic for the medicine catalog (T41).
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

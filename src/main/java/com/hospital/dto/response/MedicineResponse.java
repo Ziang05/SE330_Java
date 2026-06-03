@@ -8,7 +8,9 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/** Response DTO for medicine catalog data returned to clients. */
+/**
+ * Response DTO for medicine catalog data returned to clients.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

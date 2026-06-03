@@ -2,15 +2,13 @@ package com.hospital.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
-/** Composite key for the users-to-roles join table. */
+/**
+ * Composite key for the users-to-roles join table.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

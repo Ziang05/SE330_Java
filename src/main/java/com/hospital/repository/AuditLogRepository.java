@@ -10,7 +10,9 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/** Repository used by audit logging AOP. */
+/**
+ * Repository used by audit logging AOP.
+ */
 public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 
     @Query("""

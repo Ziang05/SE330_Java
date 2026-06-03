@@ -15,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/** Sample PatientService implementation with basic CRUD logic. */
+/**
+ * Sample PatientService implementation with basic CRUD logic.
+ */
 @Service
 @RequiredArgsConstructor
 public class PatientServiceImpl implements PatientService {

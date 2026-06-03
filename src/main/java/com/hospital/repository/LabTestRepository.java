@@ -8,13 +8,19 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.util.List;
 
-/** Repository for lab tests. */
+/**
+ * Repository for lab tests.
+ */
 public interface LabTestRepository extends JpaRepository<LabTest, Long> {
 
-    /** Lấy tất cả xét nghiệm theo medical_record_id. */
+    /**
+     * Lấy tất cả xét nghiệm theo medical_record_id.
+     */
     List<LabTest> findByMedicalRecordId(Long medicalRecordId);
 
-    /** Tính tổng phí xét nghiệm của một medical record. */
+    /**
+     * Tính tổng phí xét nghiệm của một medical record.
+     */
     @Query("SELECT COALESCE(SUM(lt.fee), 0) FROM LabTest lt WHERE lt.medicalRecord.id = :medicalRecordId")
     BigDecimal sumLabFeeByMedicalRecordId(@Param("medicalRecordId") Long medicalRecordId);
 }
