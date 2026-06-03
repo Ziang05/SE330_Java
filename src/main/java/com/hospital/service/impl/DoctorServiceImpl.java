@@ -1,5 +1,6 @@
 package com.hospital.service.impl;
 
+import com.hospital.audit.Auditable;
 import com.hospital.dto.request.DoctorRequest;
 import com.hospital.dto.response.DoctorResponse;
 import com.hospital.entity.Department;
@@ -10,6 +11,7 @@ import com.hospital.repository.DoctorRepository;
 import com.hospital.service.DoctorService;
 import com.hospital.util.DoctorMapper;
 import jakarta.annotation.Nonnull;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +27,8 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
+    @Transactional
+    @Auditable(action = "CREATE", entityType = "Doctor")
     public DoctorResponse create(DoctorRequest request) {
         Department department = getDepartment(request);
         Doctor saved = this.doctorRepository.save(DoctorMapper.toEntity(request, department));
@@ -37,6 +41,8 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
+    @Transactional
+    @Auditable(action = "UPDATE", entityType = "Doctor")
     public DoctorResponse update(Long doctorId, DoctorRequest request) {
         Doctor doctor = getDoctor(doctorId);
         Department department = getDepartment(request);
@@ -45,6 +51,8 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
+    @Transactional
+    @Auditable(action = "DELETE", entityType = "Doctor")
     public void delete(Long doctorId) {
         Doctor doctor = getDoctor(doctorId);
         this.doctorRepository.delete(doctor);
