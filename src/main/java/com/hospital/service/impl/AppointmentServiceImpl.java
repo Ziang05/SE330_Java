@@ -125,4 +125,25 @@ public class AppointmentServiceImpl implements AppointmentService {
         log.info("Cập nhật trạng thái lịch hẹn ID {} thành công sang {}", id, newStatus);
         return appointmentMapper.toResponse(updatedAppointment);
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isDoctorConflicted(Long doctorId, LocalDateTime apptDatetime) {
+        log.info("Kiểm tra conflict lịch khám nhanh cho Doctor ID: {} tại thời điểm: {}", doctorId, apptDatetime);
+
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", doctorId));
+
+        LocalDateTime startRange = apptDatetime.minusMinutes(29);
+        LocalDateTime endRange = apptDatetime.plusMinutes(29);
+
+        List<Appointment> conflictingAppointments = appointmentRepository
+                .findByDoctorAndApptDatetimeBetween(doctor, startRange, endRange);
+
+        long activeConflicts = conflictingAppointments.stream()
+                .filter(appt -> appt.getStatus() != AppointmentStatus.CANCELLED)
+                .count();
+
+        return activeConflicts > 0;
+    }
 }

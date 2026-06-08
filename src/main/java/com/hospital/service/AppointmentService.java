@@ -16,4 +16,6 @@ public interface AppointmentService {
     List<AppointmentResponse> getAppointmentsByPatientId(Long patientId);
 
     AppointmentResponse updateAppointmentStatus(Long id, AppointmentStatus status);
+
+    boolean isDoctorConflicted(Long doctorId, java.time.LocalDateTime apptDatetime);
 }

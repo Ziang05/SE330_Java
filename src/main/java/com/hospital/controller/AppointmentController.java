@@ -96,4 +96,21 @@ public class AppointmentController {
         
         return ApiResponse.ok(message, response);
     }
+
+    /**
+    * API Kiểm tra trùng lịch khám của bác sĩ nhanh.
+    * Dùng cho Frontend check real-time khi bệnh nhân vừa chọn giờ trên lịch.
+    */
+    @GetMapping("/check-conflict")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
+    public ApiResponse<Boolean> checkConflict(
+            @RequestParam Long doctorId,
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime apptDatetime) {
+        
+        log.info("REST request - Kiểm tra trùng lịch cho Doctor ID: {} lúc: {}", doctorId, apptDatetime);
+        boolean isConflicted = appointmentService.isDoctorConflicted(doctorId, apptDatetime);
+        
+        String message = isConflicted ? "Khung giờ này đã có người đặt!" : "Khung giờ này hoàn toàn trống.";
+        return ApiResponse.ok(message, isConflicted);
+    }
 }
