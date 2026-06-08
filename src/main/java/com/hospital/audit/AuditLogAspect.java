@@ -15,7 +15,9 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
-/** Writes audit rows after methods annotated with @Auditable complete successfully. */
+/**
+ * Writes audit rows after methods annotated with @Auditable complete successfully.
+ */
 @Aspect
 @Component
 @RequiredArgsConstructor

@@ -10,7 +10,9 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-/** Request payload for creating or updating a medicine catalog entry. */
+/**
+ * Request payload for creating or updating a medicine catalog entry.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,6 +36,8 @@ public class MedicineRequest {
     @DecimalMin(value = "0.0", inclusive = false, message = "Giá thuốc phải lớn hơn 0")
     private BigDecimal unitPrice;
 
-    /** true = thuốc thuộc danh mục BHYT chi trả. */
+    /**
+     * true = thuốc thuộc danh mục BHYT chi trả.
+     */
     private boolean insuranceCovered = false;
 }

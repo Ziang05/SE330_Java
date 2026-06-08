@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-/** Repository for role catalog. */
+/**
+ * Repository for role catalog.
+ */
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
     Optional<Role> findByRoleName(RoleName roleName);

@@ -5,7 +5,9 @@ import com.hospital.dto.response.PatientResponse;
 
 import java.util.List;
 
-/** Sample service contract for patient CRUD. */
+/**
+ * Sample service contract for patient CRUD.
+ */
 public interface PatientService {
 
     PatientResponse create(PatientRequest request);

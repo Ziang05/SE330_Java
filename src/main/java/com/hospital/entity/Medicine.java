@@ -22,23 +22,33 @@ import java.math.BigDecimal;
 @Table(name = "medicines")
 public class Medicine extends BaseEntity {
 
-    /** Tên thương mại của thuốc. */
+    /**
+     * Tên thương mại của thuốc.
+     */
     @Column(name = "medicine_name", nullable = false, length = 150)
     private String medicineName;
 
-    /** Tên hoạt chất / tên generic. */
+    /**
+     * Tên hoạt chất / tên generic.
+     */
     @Column(name = "generic_name", length = 150)
     private String genericName;
 
-    /** Nhóm thuốc (ví dụ: Kháng sinh, Giảm đau, Vitamin). */
+    /**
+     * Nhóm thuốc (ví dụ: Kháng sinh, Giảm đau, Vitamin).
+     */
     @Column(name = "category", length = 80)
     private String category;
 
-    /** Đơn vị tính (viên, ml, lọ, gói...). */
+    /**
+     * Đơn vị tính (viên, ml, lọ, gói...).
+     */
     @Column(name = "unit", length = 30)
     private String unit;
 
-    /** Giá bán lẻ một đơn vị (VNĐ). */
+    /**
+     * Giá bán lẻ một đơn vị (VNĐ).
+     */
     @Column(name = "unit_price", precision = 12, scale = 2, nullable = false)
     private BigDecimal unitPrice = BigDecimal.ZERO;
 
@@ -50,7 +60,9 @@ public class Medicine extends BaseEntity {
     @Column(name = "insurance_covered", nullable = false)
     private boolean insuranceCovered = false;
 
-    /** Có đang kinh doanh / còn hiệu lực trong danh mục không. */
+    /**
+     * Có đang kinh doanh / còn hiệu lực trong danh mục không.
+     */
     @Column(name = "active", nullable = false)
     private boolean active = true;
 }

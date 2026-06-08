@@ -1,17 +1,13 @@
 package com.hospital.entity;
 
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Join entity mapping users to roles with a composite primary key. */
+/**
+ * Join entity mapping users to roles with a composite primary key.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

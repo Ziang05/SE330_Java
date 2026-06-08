@@ -7,16 +7,7 @@ import com.hospital.repository.InvoiceRepository;
 import com.hospital.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +37,9 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class ReportServiceImpl implements ReportService {
 
-    /** Giới hạn tối đa kỳ báo cáo – tránh query lấy hàng triệu dòng. */
+    /**
+     * Giới hạn tối đa kỳ báo cáo – tránh query lấy hàng triệu dòng.
+     */
     private static final long MAX_DAYS = 365;
 
     private final InvoiceRepository invoiceRepository;
@@ -67,11 +60,11 @@ public class ReportServiceImpl implements ReportService {
         // ── 2. Chuyển LocalDate → LocalDateTime để query ─────────────────────────
         // from: đầu ngày (00:00:00)  |  to: cuối ngày (23:59:59)
         LocalDateTime startDt = from.atStartOfDay();
-        LocalDateTime endDt   = to.atTime(LocalTime.MAX);
+        LocalDateTime endDt = to.atTime(LocalTime.MAX);
 
         // ── 3. Lấy dữ liệu từ Repository ────────────────────────────────────────
-        BigDecimal totalRevenue  = invoiceRepository.sumRevenueBetween(startDt, endDt);
-        long       totalVisits   = invoiceRepository.countVisitsBetween(startDt, endDt);
+        BigDecimal totalRevenue = invoiceRepository.sumRevenueBetween(startDt, endDt);
+        long totalVisits = invoiceRepository.countVisitsBetween(startDt, endDt);
 
         // Tổng BHYT chi trả: dùng lại sumInsuranceBetween (sẽ thêm query vào Repository)
         BigDecimal totalInsurance = invoiceRepository.sumInsuranceBetween(startDt, endDt);
@@ -147,15 +140,17 @@ public class ReportServiceImpl implements ReportService {
         }
     }
 
-    /** Sheet 1: "Summary" – tóm tắt tổng kỳ báo cáo. */
+    /**
+     * Sheet 1: "Summary" – tóm tắt tổng kỳ báo cáo.
+     */
     private void buildSummarySheet(Workbook wb, RevenueReportResponse report) {
         Sheet sheet = wb.createSheet("Summary");
         sheet.setColumnWidth(0, 9000);
         sheet.setColumnWidth(1, 6000);
 
-        CellStyle titleStyle  = makeTitleStyle(wb);
+        CellStyle titleStyle = makeTitleStyle(wb);
         CellStyle headerStyle = makeHeaderStyle(wb);
-        CellStyle dataStyle   = makeDataStyle(wb);
+        CellStyle dataStyle = makeDataStyle(wb);
 
         // Tiêu đề
         Row title = sheet.createRow(0);
@@ -163,16 +158,16 @@ public class ReportServiceImpl implements ReportService {
 
         // Header
         Row header = sheet.createRow(2);
-        createCell(header, 0, "Metric",             headerStyle);
-        createCell(header, 1, "Value",               headerStyle);
+        createCell(header, 0, "Metric", headerStyle);
+        createCell(header, 1, "Value", headerStyle);
 
         // Data rows
         String[][] rows = {
-                {"Total Revenue (VND)",    report.getTotalRevenue().toPlainString()},
-                {"Total Insurance (VND)",  report.getTotalInsuranceAmount().toPlainString()},
-                {"Total Visits",           String.valueOf(report.getTotalVisits())},
-                {"From Date",              report.getFromDate().toString()},
-                {"To Date",                report.getToDate().toString()},
+                {"Total Revenue (VND)", report.getTotalRevenue().toPlainString()},
+                {"Total Insurance (VND)", report.getTotalInsuranceAmount().toPlainString()},
+                {"Total Visits", String.valueOf(report.getTotalVisits())},
+                {"From Date", report.getFromDate().toString()},
+                {"To Date", report.getToDate().toString()},
         };
 
         for (int i = 0; i < rows.length; i++) {
@@ -182,7 +177,9 @@ public class ReportServiceImpl implements ReportService {
         }
     }
 
-    /** Sheet 2: "Daily Breakdown" – chi tiết từng ngày. */
+    /**
+     * Sheet 2: "Daily Breakdown" – chi tiết từng ngày.
+     */
     private void buildDailySheet(Workbook wb, RevenueReportResponse report) {
         Sheet sheet = wb.createSheet("Daily Breakdown");
         sheet.setColumnWidth(0, 5000);
@@ -191,21 +188,21 @@ public class ReportServiceImpl implements ReportService {
         sheet.setColumnWidth(3, 4000);
 
         CellStyle headerStyle = makeHeaderStyle(wb);
-        CellStyle dataStyle   = makeDataStyle(wb);
+        CellStyle dataStyle = makeDataStyle(wb);
 
         // Header row
         Row header = sheet.createRow(0);
-        createCell(header, 0, "Date",          headerStyle);
+        createCell(header, 0, "Date", headerStyle);
         createCell(header, 1, "Revenue (VND)", headerStyle);
-        createCell(header, 2, "Visits",        headerStyle);
+        createCell(header, 2, "Visits", headerStyle);
 
         // Data rows
         int rowIdx = 1;
         for (RevenueReportResponse.DailySummary day : report.getDailyBreakdown()) {
             Row row = sheet.createRow(rowIdx++);
-            createCell(row, 0, day.getDate().toString(),             dataStyle);
-            createCell(row, 1, day.getRevenue().toPlainString(),     dataStyle);
-            createCell(row, 2, String.valueOf(day.getVisits()),      dataStyle);
+            createCell(row, 0, day.getDate().toString(), dataStyle);
+            createCell(row, 1, day.getRevenue().toPlainString(), dataStyle);
+            createCell(row, 2, String.valueOf(day.getVisits()), dataStyle);
         }
     }
 

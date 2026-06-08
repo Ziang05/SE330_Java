@@ -1,21 +1,16 @@
 package com.hospital.entity;
 
 import com.hospital.entity.enums.PrescriptionStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 
-/** Prescription header issued from a medical record. */
+/**
+ * Prescription header issued from a medical record.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

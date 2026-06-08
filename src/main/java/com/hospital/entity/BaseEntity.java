@@ -1,18 +1,14 @@
 package com.hospital.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/** Common auto-increment id and audit timestamps for most entities. */
+/**
+ * Common auto-increment id and audit timestamps for most entities.
+ */
 @Getter
 @Setter
 @MappedSuperclass

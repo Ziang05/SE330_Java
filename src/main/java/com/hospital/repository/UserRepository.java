@@ -9,7 +9,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-/** Repository for users; security integration will be added later. */
+/**
+ * Repository for users; security integration will be added later.
+ */
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsername(String username);

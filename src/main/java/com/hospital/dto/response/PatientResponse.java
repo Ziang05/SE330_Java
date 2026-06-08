@@ -9,7 +9,9 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/** Response DTO for patient data returned to clients. */
+/**
+ * Response DTO for patient data returned to clients.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

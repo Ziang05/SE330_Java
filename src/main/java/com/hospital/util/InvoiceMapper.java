@@ -3,7 +3,9 @@ package com.hospital.util;
 import com.hospital.dto.response.InvoiceResponse;
 import com.hospital.entity.Invoice;
 
-/** Mapper utility for Invoice entity ↔ DTO conversions. */
+/**
+ * Mapper utility for Invoice entity ↔ DTO conversions.
+ */
 public final class InvoiceMapper {
 
     private InvoiceMapper() {

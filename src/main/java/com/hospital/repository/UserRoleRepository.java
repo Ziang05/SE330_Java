@@ -9,7 +9,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-/** Repository for user-role assignments. */
+/**
+ * Repository for user-role assignments.
+ */
 public interface UserRoleRepository extends JpaRepository<UserRole, UserRoleId> {
 
     @Query("select ur from UserRole ur join fetch ur.role where ur.user.id = :userId")

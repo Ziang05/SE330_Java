@@ -10,7 +10,9 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-/** Request payload for creating or updating a patient. */
+/**
+ * Request payload for creating or updating a patient.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

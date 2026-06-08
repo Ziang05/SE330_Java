@@ -1,19 +1,23 @@
 -- Seed data for local development and team onboarding.
-SET @now = NOW(6);
+SET
+@now = NOW(6);
 
-INSERT IGNORE INTO departments (id, dept_name, location, phone, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO departments (id, dept_name, location, phone, created_at, updated_at) VALUES
 (1, 'Noi khoa', 'Tang 2 - Khu A', '028-1001', @now, @now),
 (2, 'Ngoai khoa', 'Tang 3 - Khu A', '028-1002', @now, @now),
 (3, 'Nhi khoa', 'Tang 2 - Khu B', '028-1003', @now, @now),
 (4, 'Tim mach', 'Tang 4 - Khu A', '028-1004', @now, @now),
 (5, 'Xet nghiem', 'Tang 1 - Khu C', '028-1005', @now, @now);
 
-INSERT IGNORE INTO doctors (id, full_name, phone, email, license_number, hire_date, department_id, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO doctors (id, full_name, phone, email, license_number, hire_date, department_id, created_at, updated_at) VALUES
 (1, 'Nguyen Van An', '0901000001', 'an.nguyen@hospital.local', 'LIC-IM-001', '2020-03-01', 1, @now, @now),
 (2, 'Tran Thi Binh', '0901000002', 'binh.tran@hospital.local', 'LIC-SUR-001', '2019-07-15', 2, @now, @now),
 (3, 'Le Minh Chau', '0901000003', 'chau.le@hospital.local', 'LIC-CAR-001', '2021-01-10', 4, @now, @now);
 
-INSERT IGNORE INTO medicines (id, medicine_name, generic_name, category, unit, unit_price, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO medicines (id, medicine_name, generic_name, category, unit, unit_price, created_at, updated_at) VALUES
 (1, 'Amoxicillin 500mg', 'Amoxicillin', 'Khang sinh', 'Vien', 2500.00, @now, @now),
 (2, 'Cefixime 200mg', 'Cefixime', 'Khang sinh', 'Vien', 6500.00, @now, @now),
 (3, 'Azithromycin 500mg', 'Azithromycin', 'Khang sinh', 'Vien', 12000.00, @now, @now),
@@ -35,21 +39,24 @@ INSERT IGNORE INTO medicines (id, medicine_name, generic_name, category, unit, u
 (19, 'Metformin 500mg', 'Metformin', 'Noi tiet', 'Vien', 1400.00, @now, @now),
 (20, 'Insulin Regular', 'Insulin Human', 'Noi tiet', 'Lo', 125000.00, @now, @now);
 
-INSERT IGNORE INTO roles (id, role_name, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO roles (id, role_name, created_at, updated_at) VALUES
 (1, 'ADMIN', @now, @now),
 (2, 'DOCTOR', @now, @now),
 (3, 'NURSE', @now, @now),
 (4, 'CASHIER', @now, @now);
 
 -- Training credentials: admin/admin123, doctor1/doctor123, doctor2/doctor123, nurse1/nurse123, cashier1/cashier123.
-INSERT IGNORE INTO users (id, username, password_hash, email, full_name, is_active, doctor_id, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO users (id, username, password_hash, email, full_name, is_active, doctor_id, created_at, updated_at) VALUES
 (1, 'admin', '$2a$10$C4j99tjEM/GY82xwqqi9cuNE0U4PPWSxrW8dlaiN5P1qQXOQUsZ4i', 'admin@hospital.local', 'System Administrator', b'1', NULL, @now, @now),
 (2, 'doctor1', '$2a$10$v2f/o/5p8aQouFu.jsZSGOwhf4GwwoveUd6/wJ0XYftgc.dBpmL2K', 'doctor1@hospital.local', 'Doctor One', b'1', 1, @now, @now),
 (3, 'doctor2', '$2a$10$v2f/o/5p8aQouFu.jsZSGOwhf4GwwoveUd6/wJ0XYftgc.dBpmL2K', 'doctor2@hospital.local', 'Doctor Two', b'1', 2, @now, @now),
 (4, 'nurse1', '$2a$10$QgJMU9tVoguWGmWFf2.iMOPT8Thw2Wc5NkVp/f5eQUtXslVj76KpK', 'nurse1@hospital.local', 'Nurse One', b'1', NULL, @now, @now),
 (5, 'cashier1', '$2a$10$9S6QNL4JaUUHXEs0jqq9Ku19u5U/62SLT8G/pFTHI1vAMPfoMjqJ.', 'cashier1@hospital.local', 'Cashier One', b'1', NULL, @now, @now);
 
-INSERT IGNORE INTO user_roles (user_id, role_id) VALUES
+INSERT
+IGNORE INTO user_roles (user_id, role_id) VALUES
 (1, 1),
 (2, 2),
 (3, 2),
@@ -59,26 +66,32 @@ INSERT IGNORE INTO user_roles (user_id, role_id) VALUES
 -- ==========================================
 -- TEST DATA CHO MODULE THANH TOÁN (T39-T40)
 -- ==========================================
-INSERT IGNORE INTO patients (id, full_name, dob, gender, cccd, phone, address, insurance_number, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO patients (id, full_name, dob, gender, cccd, phone, address, insurance_number, created_at, updated_at) VALUES
 (1, 'Test Patient', '1990-01-01', 'MALE', '012345678912', '0999999999', 'HCMC', 'DN123456789', @now, @now);
 
-INSERT IGNORE INTO appointments (id, patient_id, doctor_id, appt_datetime, status, notes, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO appointments (id, patient_id, doctor_id, appt_datetime, status, notes, created_at, updated_at) VALUES
 (1, 1, 1, @now, 'COMPLETED', 'Kham tong quat', @now, @now);
 
-INSERT IGNORE INTO medical_records (id, patient_id, doctor_id, appointment_id, diagnosis, visit_date, notes, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO medical_records (id, patient_id, doctor_id, appointment_id, diagnosis, visit_date, notes, created_at, updated_at) VALUES
 (1, 1, 1, 1, 'Viem hong hat', DATE(@now), 'Benh nhan co BHYT', @now, @now);
 
 -- Đơn thuốc cho MedicalRecord 1
-INSERT IGNORE INTO prescriptions (id, medical_record_id, doctor_id, issued_date, status, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO prescriptions (id, medical_record_id, doctor_id, issued_date, status, created_at, updated_at) VALUES
 (1, 1, 1, DATE(@now), 'COMPLETED', @now, @now);
 
 -- Thêm 2 loại thuốc vào đơn: Amoxicillin (2500đ) x 20, Paracetamol (1200đ) x 10
-INSERT IGNORE INTO prescription_items (id, prescription_id, medicine_id, quantity, dosage, instructions, unit_price_at_time, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO prescription_items (id, prescription_id, medicine_id, quantity, dosage, instructions, unit_price_at_time, created_at, updated_at) VALUES
 (1, 1, 1, 20, '2 vien/ngay', 'Sang 1 chieu 1', 2500.00, @now, @now),
 (2, 1, 4, 10, '1 vien/lan', 'Khi sot', 1200.00, @now, @now);
 
 -- Xét nghiệm cho MedicalRecord 1
-INSERT IGNORE INTO lab_tests (id, medical_record_id, test_type, ordered_by, result, status, test_date, fee, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO lab_tests (id, medical_record_id, test_type, ordered_by, result, status, test_date, fee, created_at, updated_at) VALUES
 (1, 1, 'Xet nghiem mau sinh hoa', 1, 'Binh thuong', 'COMPLETED', @now, 150000.00, @now, @now),
 (2, 1, 'Sieu am vung co', 1, 'Viem nhe', 'COMPLETED', @now, 80000.00, @now, @now);
 
@@ -86,17 +99,20 @@ INSERT IGNORE INTO lab_tests (id, medical_record_id, test_type, ordered_by, resu
 -- TEST DATA CHO BÁO CÁO DOANH THU (T42)
 -- ==========================================
 -- Bệnh nhân 2 & 3
-INSERT IGNORE INTO patients (id, full_name, dob, gender, phone, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO patients (id, full_name, dob, gender, phone, created_at, updated_at) VALUES
 (2, 'Nguyen Van B', '1985-05-15', 'MALE', '0988888888', @now, @now),
 (3, 'Tran Thi C', '1992-10-20', 'FEMALE', '0977777777', @now, @now);
 
 -- Hồ sơ khám bệnh 2 & 3 (khám vào hôm qua và hôm kia)
-INSERT IGNORE INTO medical_records (id, patient_id, doctor_id, diagnosis, visit_date, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO medical_records (id, patient_id, doctor_id, diagnosis, visit_date, created_at, updated_at) VALUES
 (2, 2, 2, 'Kham dinh ky', DATE(DATE_SUB(@now, INTERVAL 1 DAY)), @now, @now),
 (3, 3, 3, 'Kham tim mach', DATE(DATE_SUB(@now, INTERVAL 2 DAY)), @now, @now);
 
 -- Hóa đơn thanh toán trong 3 ngày liên tiếp (để test biểu đồ doanh thu)
-INSERT IGNORE INTO invoices (id, medical_record_id, patient_id, examination_fee, medicine_fee, lab_fee, total_amount, insurance_coverage, insurance_amount, paid_amount, payment_method, status, paid_at, created_at, updated_at) VALUES
+INSERT
+IGNORE INTO invoices (id, medical_record_id, patient_id, examination_fee, medicine_fee, lab_fee, total_amount, insurance_coverage, insurance_amount, paid_amount, payment_method, status, paid_at, created_at, updated_at) VALUES
 -- Hóa đơn 1: Hôm nay (thuộc về Patient 1 ở trên), trả 88,400đ
 (1, 1, 1, 150000.00, 62000.00, 230000.00, 442000.00, 'EIGHTY', 353600.00, 88400.00, 'CASH', 'PAID', @now, @now, @now),
 

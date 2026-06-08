@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/** Repository for appointment schedules. */
+/**
+ * Repository for appointment schedules.
+ */
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
     List<Appointment> findByDoctorAndApptDatetimeBetween(Doctor doctor, LocalDateTime start, LocalDateTime end);

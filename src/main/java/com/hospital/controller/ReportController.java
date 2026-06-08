@@ -55,7 +55,7 @@ public class ReportController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
         // Giá trị mặc định: 30 ngày gần nhất nếu không truyền tham số
-        LocalDate endDate   = (to   != null) ? to   : LocalDate.now();
+        LocalDate endDate = (to != null) ? to : LocalDate.now();
         LocalDate startDate = (from != null) ? from : endDate.minusDays(29);
 
         RevenueReportResponse report = reportService.getRevenueReport(startDate, endDate);
@@ -81,7 +81,7 @@ public class ReportController {
     @GetMapping("/revenue/this-month")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<RevenueReportResponse>> getRevenueThisMonth() {
-        LocalDate today      = LocalDate.now();
+        LocalDate today = LocalDate.now();
         LocalDate firstOfMonth = today.withDayOfMonth(1);
         return ResponseEntity.ok(
                 ApiResponse.ok("Bao cao doanh thu thang nay",
@@ -102,7 +102,7 @@ public class ReportController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
-        LocalDate endDate   = (to   != null) ? to   : LocalDate.now();
+        LocalDate endDate = (to != null) ? to : LocalDate.now();
         LocalDate startDate = (from != null) ? from : endDate.minusDays(29);
 
         byte[] excelBytes = reportService.exportRevenueToExcel(startDate, endDate);
