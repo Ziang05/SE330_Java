@@ -26,7 +26,7 @@ public class MedicalRecordController {
 
     /**
      * API Thực hiện thủ tục Tiếp nhận bệnh nhân tại quầy (Check-in).
-     * Quyền truy cập (Đầu việc 6): Chỉ ADMIN hoặc NURSE mới có quyền tiếp đón bệnh nhân.
+     * Chỉ ADMIN hoặc NURSE mới có quyền tiếp đón bệnh nhân.
      */
     @PostMapping("/check-in")
     @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")

@@ -29,4 +29,6 @@ public interface PrescriptionItemRepository extends JpaRepository<PrescriptionIt
             "JOIN pi.prescription p " +
             "WHERE p.medicalRecord.id = :medicalRecordId")
     BigDecimal sumMedicineFeByMedicalRecordId(@Param("medicalRecordId") Long medicalRecordId);
+
+    List<PrescriptionItem> findByPrescriptionId(Long prescriptionId);
 }
