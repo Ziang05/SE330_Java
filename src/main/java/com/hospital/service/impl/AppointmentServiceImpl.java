@@ -15,11 +15,14 @@ import com.hospital.repository.PatientRepository;
 import com.hospital.service.AppointmentService;
 import com.hospital.service.EmailService;
 import com.hospital.util.AppointmentMapper;
+import com.hospital.util.PdfGeneratorUtil;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -162,5 +165,18 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .count();
 
         return activeConflicts > 0;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ByteArrayInputStream exportAppointmentSlipPdf(Long id) {
+        log.info("Bắt đầu xử lý nghiệp vụ kết xuất PDF Phiếu hẹn khám cho ID: {}", id);
+    
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> {
+                log.error("Không tìm thấy thông tin lịch hẹn khám bệnh với ID: {}", id);
+                return new ResourceNotFoundException("Appointment", "id", id);
+        });
+
+        return PdfGeneratorUtil.generateAppointmentSlip(appointment);
     }
 }

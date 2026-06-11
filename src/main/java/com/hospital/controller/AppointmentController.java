@@ -8,9 +8,15 @@ import com.hospital.service.AppointmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 /**
@@ -112,5 +118,27 @@ public class AppointmentController {
         
         String message = isConflicted ? "Khung giờ này đã có người đặt!" : "Khung giờ này hoàn toàn trống.";
         return ApiResponse.ok(message, isConflicted);
+    }
+
+    @GetMapping("/{id}/export-pdf")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE')")
+    public ResponseEntity<InputStreamResource> exportAppointmentSlip(@PathVariable Long id) {
+        log.info("REST request - Yêu cầu in/xuất PDF cho Lịch hẹn ID: {}", id);
+        
+        // Gọi tầng nghiệp vụ lấy luồng dữ liệu thô
+        ByteArrayInputStream pdfStream = appointmentService.exportAppointmentSlipPdf(id);
+        
+        // Đóng gói mảng byte vào Resource của Spring
+        InputStreamResource resource = new InputStreamResource(pdfStream);
+        
+        // Thiết lập cấu trúc Header HTTP chuẩn cho tệp tin truyền thông trực tuyến
+        HttpHeaders headers = new HttpHeaders();
+        // "inline": Mở tab preview trên trình duyệt; "filename": Tên file khi tải về
+        headers.add("Content-Disposition", "inline; filename=Appointment_Slip_LH" + id + ".pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF) // Khai báo định dạng file trả về là PDF
+                .body(resource);
     }
 }
