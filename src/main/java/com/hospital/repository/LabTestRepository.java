@@ -1,6 +1,8 @@
 package com.hospital.repository;
 
 import com.hospital.entity.LabTest;
+import com.hospital.entity.enums.LabTestStatus;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,4 +25,6 @@ public interface LabTestRepository extends JpaRepository<LabTest, Long> {
      */
     @Query("SELECT COALESCE(SUM(lt.fee), 0) FROM LabTest lt WHERE lt.medicalRecord.id = :medicalRecordId")
     BigDecimal sumLabFeeByMedicalRecordId(@Param("medicalRecordId") Long medicalRecordId);
+
+    List<LabTest> findByStatus(LabTestStatus status);
 }

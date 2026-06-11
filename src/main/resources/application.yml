@@ -4,6 +4,18 @@ spring:
     name: hospital-management-system
   profiles:
     active: dev
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: vinhpt.no.3@gmail.com
+    password: msoqdlrztwyhscwg
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
 springdoc:
   swagger-ui:

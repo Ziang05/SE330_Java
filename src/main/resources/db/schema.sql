@@ -205,6 +205,10 @@ CREATE TABLE IF NOT EXISTS appointments
     INDEX idx_appointments_appt_datetime
 (
     appt_datetime
+),
+    INDEX idx_appointments_conflict_check
+(
+    doctor_id, appt_datetime, status
 )
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_unicode_ci;
 

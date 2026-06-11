@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác Nhận Lịch Hẹn Khám Bệnh</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+        .content {
+            padding: 25px;
+        }
+        .welcome-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .info-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        .info-table td.label {
+            font-weight: bold;
+            color: #555555;
+            width: 35%;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #777777;
+            border-top: 1px solid #e0e0e0;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #856404;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>HỆ THỐNG QUẢN LÝ BỆNH VIỆN MEDIPLUS</h2>
+        </div>
+        
+        <div class="content">
+            <p class="welcome-text">Xin chào, <span th:text="${patientName}">Bệnh nhân</span>!</p>
+            <p>Yêu cầu đặt lịch hẹn khám bệnh của ông/bà tại hệ thống phòng khám MediPlus đã được tiếp nhận và xác nhận thành công. Chi tiết lịch hẹn cụ thể như sau:</p>
+            
+            <table class="info-table">
+                <tr>
+                    <td class="label">Mã lịch hẹn:</td>
+                    <td th:text="${appointmentId}">#12345</td>
+                </tr>
+                <tr>
+                    <td class="label">Bác sĩ phụ trách:</td>
+                    <td th:text="${doctorName}">Bác sĩ Chuyên Khoa</td>
+                </tr>
+                <tr>
+                    <td class="label">Thời gian khám:</td>
+                    <td style="font-weight: bold; color: #dc3545;" th:text="${appointmentTime}">2026-06-15 09:00</td>
+                </tr>
+                <tr>
+                    <td class="label">Chuyên khoa:</td>
+                    <td th:text="${departmentName != null ? departmentName : 'Khám tổng quát'}">Khoa Nội</td>
+                </tr>
+            </table>
+            
+            <div class="note">
+                <strong>Lưu ý quan trọng:</strong> Vui lòng có mặt tại quầy tiếp đón trước thời gian hẹn khám từ 10 - 15 phút để làm thủ tục check-in nhận số thứ tự lâm sàng. Nếu có nhu cầu thay đổi hoặc hủy lịch, vui lòng liên hệ hotline 1900-XXXX trước ít nhất 2 tiếng.
+            </div>
+            
+            <p style="margin-top: 25px;">MediPlus xin kính chúc ông/bà luôn có nhiều sức khỏe!</p>
+        </div>
+        
+        <div class="footer">
+            Đây là email tự động từ hệ thống, vui lòng không phản hồi trực tiếp vào email này.<br>
+            © 2026 MediPlus Hospital. Địa chỉ: Thành phố Hồ Chí Minh, Việt Nam.
+        </div>
+    </div>
+</body>
+</html>
