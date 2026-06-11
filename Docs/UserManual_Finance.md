@@ -1,9 +1,7 @@
 # 📘 Finance Module – User Manual
 
-> **Tác giả:** Finance Team  
-> **Phiên bản:** 1.0.0  
 > **Cập nhật lần cuối:** 2026-06-11  
-> **Phạm vi:** Module Thanh Toán & Báo Cáo Doanh Thu (Task T38–T46)
+> **Phạm vi:** Module Thanh Toán & Báo Cáo Doanh Thu
 
 ---
 
