@@ -13,6 +13,7 @@ import com.hospital.repository.AppointmentRepository;
 import com.hospital.repository.DoctorRepository;
 import com.hospital.repository.PatientRepository;
 import com.hospital.service.AppointmentService;
+import com.hospital.service.EmailService;
 import com.hospital.util.AppointmentMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
     private final AppointmentMapper appointmentMapper;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -66,6 +68,21 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         Appointment appointment = appointmentMapper.toEntity(request, patient, doctor);
         Appointment savedAppointment = appointmentRepository.save(appointment);
+
+        try {
+            if (request != null && request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+                
+            String recipientEmail = request.getEmail().trim();
+            log.info("Lịch hẹn ID #{} lưu thành công. Phát hiện email khách hàng từ Request. Tiến hành gửi thư tới: {}", 
+                        savedAppointment.getId(), recipientEmail);
+                
+            emailService.sendAppointmentConfirmationEmail(savedAppointment, recipientEmail);
+            } else {
+            log.warn("Lịch hẹn ID #{} được tạo nhưng Request không đính kèm thông tin Email nhận thông báo.", savedAppointment.getId());
+            }
+        } catch (Exception ex) {
+                log.error("Hệ thống gặp sự cố ngoài ý muốn khi kích hoạt gửi email thông báo: {}", ex.getMessage());
+        }
 
         log.info("Tạo lịch hẹn thành công! Appointment ID: {}", savedAppointment.getId());
         return appointmentMapper.toResponse(savedAppointment);

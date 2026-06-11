@@ -9,6 +9,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import io.micrometer.common.lang.Nullable;
+
 /**
  * DTO hứng dữ liệu tạo mới hoặc cập nhật lịch hẹn từ Frontend.
  */
@@ -26,6 +28,9 @@ public class AppointmentRequest {
     @NotNull(message = "Thời gian hẹn khám không được để trống")
     @FutureOrPresent(message = "Thời gian hẹn khám phải ở hiện tại hoặc tương lai")
     private LocalDateTime apptDatetime;
+
+    @Nullable
+    private String email;
 
     @Size(max = 500, message = "Ghi chú không được vượt quá 500 ký tự")
     private String notes;
