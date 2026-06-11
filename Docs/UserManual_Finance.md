@@ -1,6 +1,6 @@
 # 📘 Finance Module – User Manual
 
-> **Tác giả:** Văn  
+> **Tác giả:** Finance Team  
 > **Phiên bản:** 1.0.0  
 > **Cập nhật lần cuối:** 2026-06-11  
 > **Phạm vi:** Module Thanh Toán & Báo Cáo Doanh Thu (Task T38–T46)
@@ -9,7 +9,7 @@
 
 ## 1. Giới Thiệu
 
-Module Finance quản lý toàn bộ luồng thanh toán và báo cáo tài chính của hệ thống bệnh viện. Module này do **Văn** phụ trách và bao gồm các chức năng sau:
+Module Finance quản lý toàn bộ luồng thanh toán và báo cáo tài chính của hệ thống bệnh viện. Module này bao gồm các chức năng sau:
 
 | Chức năng | Mô tả |
 |:---|:---|
@@ -66,8 +66,8 @@ Content-Type: application/json
 
 ### Bước 3: Dán vào Swagger
 1. Mở `http://localhost:8080/swagger-ui.html`
-2. Bấm nút **Authorize 🔒** (góc trên phải)
-3. Nhập: `Bearer eyJhbGciOiJIUzI1NiJ9...`
+2. Bấm nút **Authorize 🔒**
+3. Nhập: `eyJhbGciOiJIUzI1NiJ9...`
 4. Bấm **Authorize** → **Close**
 
 > **Tài khoản test có sẵn:**
@@ -298,12 +298,12 @@ Authorization: Bearer {token}
 
 ## 5. Tích Hợp Với Các Module Khác
 
-### Luồng tích hợp với Module Appointment (Giang)
+### Luồng tích hợp với Module Appointment
 
 ```
-[Giang] Bác sĩ hoàn thành khám → MedicalRecord status = "COMPLETED"
+[Appointment Module] Bác sĩ hoàn thành khám → MedicalRecord status = "COMPLETED"
    ↓
-[Văn] POST /api/v1/invoices/medical-records/{medicalRecordId}
+[Finance Module] POST /api/v1/invoices/medical-records/{medicalRecordId}
    ↓
    Hóa đơn PENDING được tạo tự động
    ↓
@@ -311,10 +311,10 @@ Authorization: Bearer {token}
    ↓
    Hóa đơn PAID
    ↓
-[Văn] GET /api/v1/invoices/{id}/export ← In biên lai PDF
+[Finance Module] GET /api/v1/invoices/{id}/export ← In biên lai PDF
 ```
 
-> **Lưu ý cho Giang:** Sau khi bác sĩ kết thúc khám và cập nhật `MedicalRecord` thành `COMPLETED`, hãy gọi thêm `POST /api/v1/invoices/medical-records/{id}` để tự động sinh hóa đơn cho bệnh nhân.
+> **Lưu ý cho Appointment Module:** Sau khi bác sĩ kết thúc khám và cập nhật `MedicalRecord` thành `COMPLETED`, hãy gọi thêm `POST /api/v1/invoices/medical-records/{id}` để tự động sinh hóa đơn cho bệnh nhân.
 
 ---
 
