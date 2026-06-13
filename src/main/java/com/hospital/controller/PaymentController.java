@@ -35,7 +35,7 @@ public class PaymentController {
      * T40 – Tạo hóa đơn tự động sau khi bác sĩ kết thúc hồ sơ khám.
      */
     @PostMapping("/medical-records/{medicalRecordId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR', 'CASHIER')")
     public ResponseEntity<ApiResponse<InvoiceResponse>> createInvoice(
             @PathVariable Long medicalRecordId
     ) {
@@ -48,7 +48,7 @@ public class PaymentController {
      * T39 – Xác nhận thanh toán hóa đơn: PENDING → PAID.
      */
     @PostMapping("/pay")
-    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'CASHIER')")
     public ResponseEntity<ApiResponse<InvoiceResponse>> processPayment(
             @Valid @RequestBody PaymentRequest request
     ) {
@@ -60,7 +60,7 @@ public class PaymentController {
      * Lấy chi tiết một hóa đơn (để in biên lai, kiểm tra).
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR', 'CASHIER')")
     public ResponseEntity<ApiResponse<InvoiceResponse>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(paymentService.getById(id)));
     }
@@ -69,7 +69,7 @@ public class PaymentController {
      * Lịch sử thanh toán của một bệnh nhân (mới nhất trước).
      */
     @GetMapping("/patient/{patientId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR', 'CASHIER')")
     public ResponseEntity<ApiResponse<List<InvoiceResponse>>> getByPatient(
             @PathVariable Long patientId
     ) {
@@ -81,7 +81,7 @@ public class PaymentController {
      * Trả về file .pdf, trình duyệt sẽ tự download.
      */
     @GetMapping("/{id}/export")
-    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'CASHIER')")
     public ResponseEntity<byte[]> exportPdf(@PathVariable Long id) {
         byte[] pdfBytes = paymentService.exportInvoiceToPdf(id);
         String filename = "invoice-" + id + ".pdf";

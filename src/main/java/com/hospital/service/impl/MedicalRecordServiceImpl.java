@@ -71,8 +71,16 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         return mapToResponse(savedRecord);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<MedicalRecordResponse> getMedicalRecordsByPatientId(Long patientId) {
+        log.info("Lay danh sach ho so kham cua Patient ID: {}", patientId);
+        java.util.List<MedicalRecord> records = medicalRecordRepository.findByPatientIdOrderByVisitDateDesc(patientId);
+        return records.stream().map(this::mapToResponse).collect(java.util.stream.Collectors.toList());
+    }
+
     /**
-     * Hàm helper phẳng hóa dữ liệu từ Entity sang DTO Response.
+     * Ham helper phang hoa du lieu tu Entity sang DTO Response.
      */
     private MedicalRecordResponse mapToResponse(MedicalRecord record) {
         MedicalRecordResponse response = new MedicalRecordResponse();

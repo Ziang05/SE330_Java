@@ -15,9 +15,16 @@ import com.lowagie.text.pdf.PdfWriter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 
 public class PdfGeneratorUtil {
+
+    private static final String FONT_PATH = "/fonts/arial.ttf";
+
+    private static BaseFont loadUnicodeFont() throws DocumentException, IOException {
+        return BaseFont.createFont(FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+    }
     public static ByteArrayInputStream generatePrescriptionPdf(PrescriptionResponse prescription) {
         Document document = new Document(PageSize.A5);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -26,9 +33,8 @@ public class PdfGeneratorUtil {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            String fontPath = "/fonts/Arial.ttf";
-            BaseFont bf = BaseFont.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            
+            BaseFont bf = loadUnicodeFont();
+
             Font titleFont = new Font(bf, 16, Font.BOLD);
             Font headerFont = new Font(bf, 10, Font.BOLD);
             Font normalFont = new Font(bf, 10, Font.NORMAL);
@@ -82,7 +88,7 @@ public class PdfGeneratorUtil {
 
             document.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            throw new RuntimeException("Không thể tạo file PDF đơn thuốc", ex);
         }
 
         return new ByteArrayInputStream(out.toByteArray());
@@ -96,8 +102,7 @@ public class PdfGeneratorUtil {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            String fontPath = "/fonts/Arial.ttf";
-            BaseFont bf = BaseFont.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            BaseFont bf = loadUnicodeFont();
 
             Font titleFont = new Font(bf, 16, Font.BOLD);
             Font headerFont = new Font(bf, 11, Font.BOLD);
@@ -163,10 +168,15 @@ public class PdfGeneratorUtil {
 
             document.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            throw new RuntimeException("Không thể tạo file PDF phiếu hẹn khám", ex);
         }
 
-        return new ByteArrayInputStream(out.toByteArray());
+        byte[] pdfBytes = out.toByteArray();
+        if (pdfBytes.length == 0) {
+            throw new RuntimeException("Không thể tạo file PDF phiếu hẹn khám: dữ liệu rỗng");
+        }
+
+        return new ByteArrayInputStream(pdfBytes);
     }
 
     private static byte[] generateQRCodeImage(String text, int width, int height) {

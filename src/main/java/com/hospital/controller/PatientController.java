@@ -31,19 +31,19 @@ public class PatientController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE', 'CASHIER')")
     public ResponseEntity<ApiResponse<PatientResponse>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(patientService.getById(id)));
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE', 'CASHIER')")
     public ResponseEntity<ApiResponse<List<PatientResponse>>> getAll() {
         return ResponseEntity.ok(ApiResponse.ok(patientService.getAll()));
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE', 'CASHIER')")
     public ResponseEntity<ApiResponse<List<PatientResponse>>> search(@RequestParam String keyword) {
         return ResponseEntity.ok(ApiResponse.ok(patientService.searchByName(keyword)));
     }

@@ -172,7 +172,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public ByteArrayInputStream exportAppointmentSlipPdf(Long id) {
         log.info("Bắt đầu xử lý nghiệp vụ kết xuất PDF Phiếu hẹn khám cho ID: {}", id);
     
-        Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> {
+        Appointment appointment = appointmentRepository.findByIdWithPatientAndDoctor(id).orElseThrow(() -> {
                 log.error("Không tìm thấy thông tin lịch hẹn khám bệnh với ID: {}", id);
                 return new ResourceNotFoundException("Appointment", "id", id);
         });

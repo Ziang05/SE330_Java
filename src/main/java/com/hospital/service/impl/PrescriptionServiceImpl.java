@@ -87,8 +87,18 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         return mapToResponse(prescription, items);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<PrescriptionResponse> getPrescriptionsByPatientId(Long patientId) {
+        log.info("Lay danh sach don thuoc cua Patient ID: {}", patientId);
+        java.util.List<Prescription> prescriptions = prescriptionRepository.findByMedicalRecordPatientIdOrderByCreatedAtDesc(patientId);
+        return prescriptions.stream()
+                .map(p -> mapToResponse(p, prescriptionItemRepository.findByPrescriptionId(p.getId())))
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     /**
-     * Hàm tiện ích phẳng hóa dữ liệu Đơn thuốc (kết hợp Master và danh sách Detail thủ công) sang DTO.
+     * Ham tien ich phang hoa du lieu Don thuoc sang DTO.
      */
     private PrescriptionResponse mapToResponse(Prescription prescription, List<PrescriptionItem> items) {
         PrescriptionResponse response = new PrescriptionResponse();
