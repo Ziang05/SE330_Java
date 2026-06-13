@@ -49,7 +49,7 @@ public class DoctorController {
     }
 
     @GetMapping("/{doctorId}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
     public ResponseEntity<ApiResponse<DoctorResponse>> get(@PathVariable Long doctorId) {
         return ResponseEntity.ok(
                 ApiResponse.ok(this.doctorService.get(doctorId))
@@ -57,7 +57,7 @@ public class DoctorController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
     public ResponseEntity<ApiResponse<List<DoctorResponse>>> getAll() {
         return ResponseEntity.ok(
                 ApiResponse.ok(this.doctorService.getAll())

@@ -16,3 +16,28 @@ target/
 
 # Logs
 *.log
+
+# Generated docs/analysis
+*.md
+!README.md
+
+# Documents
+*.pdf
+*.xlsx
+*.xls
+*.doc
+*.docx
+*.ppt
+*.pptx
+
+# Archives
+*.zip
+*.rar
+*.7z
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
