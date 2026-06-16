@@ -4,7 +4,10 @@ import com.hospital.audit.Auditable;
 import com.hospital.dto.request.PaymentRequest;
 import com.hospital.dto.response.InvoiceResponse;
 import com.hospital.entity.Invoice;
+import com.hospital.entity.LabTest;
 import com.hospital.entity.MedicalRecord;
+import com.hospital.entity.Prescription;
+import com.hospital.entity.PrescriptionItem;
 import com.hospital.entity.enums.InsuranceCoverage;
 import com.hospital.entity.enums.InvoiceStatus;
 import com.hospital.exception.BusinessException;
@@ -13,6 +16,7 @@ import com.hospital.repository.InvoiceRepository;
 import com.hospital.repository.LabTestRepository;
 import com.hospital.repository.MedicalRecordRepository;
 import com.hospital.repository.PrescriptionItemRepository;
+import com.hospital.repository.PrescriptionRepository;
 import com.hospital.service.PaymentService;
 import com.hospital.util.InvoiceMapper;
 import com.lowagie.text.*;
@@ -64,6 +68,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final MedicalRecordRepository medicalRecordRepository;
     private final PrescriptionItemRepository prescriptionItemRepository;
     private final LabTestRepository labTestRepository;
+    private final PrescriptionRepository prescriptionRepository;
 
     // ── T40: AUTO-TẠO HÓA ĐƠN SAU KHI KHÁM XONG ─────────────────────────────────
 
@@ -112,7 +117,16 @@ public class PaymentServiceImpl implements PaymentService {
         Invoice saved = invoiceRepository.save(invoice);
         log.info("Invoice auto-created: id={}, medicalRecordId={}, total={}, paidAmount={}",
                 saved.getId(), medicalRecordId, totalAmount, paidAmount);
-        return InvoiceMapper.toResponse(saved);
+
+        // Fetch lab tests and prescriptions for detailed response
+        List<LabTest> labTests = labTestRepository.findByMedicalRecordId(medicalRecordId);
+        List<Prescription> prescriptions = prescriptionRepository.findByMedicalRecordId(medicalRecordId);
+        // Explicitly load prescription items to avoid lazy loading issues
+        for (Prescription rx : prescriptions) {
+            List<PrescriptionItem> items = prescriptionItemRepository.findByPrescriptionId(rx.getId());
+            rx.setPrescriptionItems(items);
+        }
+        return InvoiceMapper.toResponseWithDetails(saved, labTests, prescriptions);
     }
 
     // ── T39: XÁC NHẬN THANH TOÁN ─────────────────────────────────────────────────
@@ -146,7 +160,16 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional(readOnly = true)
     public InvoiceResponse getById(Long invoiceId) {
-        return InvoiceMapper.toResponse(findInvoice(invoiceId));
+        Invoice invoice = findInvoice(invoiceId);
+        Long mrId = invoice.getMedicalRecord().getId();
+        List<LabTest> labTests = labTestRepository.findByMedicalRecordId(mrId);
+        List<Prescription> prescriptions = prescriptionRepository.findByMedicalRecordId(mrId);
+        // Explicitly load prescription items
+        for (Prescription rx : prescriptions) {
+            List<PrescriptionItem> items = prescriptionItemRepository.findByPrescriptionId(rx.getId());
+            rx.setPrescriptionItems(items);
+        }
+        return InvoiceMapper.toResponseWithDetails(invoice, labTests, prescriptions);
     }
 
     @Override
@@ -182,10 +205,57 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElseThrow(() -> new ResourceNotFoundException("MedicalRecord", "id", id));
     }
 
+    // ── RECALCULATE: TÍNH LẠI HÓA ĐƠN SAU KHI THÊM PRESCRIPTION/LAB TEST ──────────
+
+    @Override
+    @Transactional
+    @Auditable(action = "RECALCULATE", entityType = "Invoice")
+    public InvoiceResponse recalculateInvoice(Long medicalRecordId) {
+        Invoice invoice = invoiceRepository.findByMedicalRecordId(medicalRecordId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice", "medicalRecordId", medicalRecordId));
+
+        if (invoice.getStatus() == InvoiceStatus.PAID) {
+            throw new BusinessException("Hóa đơn #" + invoice.getId() + " đã thanh toán, không thể tính lại.");
+        }
+        if (invoice.getStatus() == InvoiceStatus.CANCELLED) {
+            throw new BusinessException("Hóa đơn #" + invoice.getId() + " đã bị hủy, không thể tính lại.");
+        }
+
+        // Re-sum medicine and lab fees from current data
+        BigDecimal medicineFee = prescriptionItemRepository.sumMedicineFeByMedicalRecordId(medicalRecordId);
+        BigDecimal labFee = labTestRepository.sumLabFeeByMedicalRecordId(medicalRecordId);
+        BigDecimal totalAmount = EXAMINATION_FEE.add(medicineFee).add(labFee);
+
+        // Re-calculate insurance
+        BigDecimal insuranceAmount = calculateInsuranceAmount(totalAmount, invoice.getInsuranceCoverage());
+        BigDecimal paidAmount = totalAmount.subtract(insuranceAmount);
+
+        // Update invoice
+        invoice.setMedicineFee(medicineFee);
+        invoice.setLabFee(labFee);
+        invoice.setTotalAmount(totalAmount);
+        invoice.setInsuranceAmount(insuranceAmount);
+        invoice.setPaidAmount(paidAmount);
+
+        Invoice saved = invoiceRepository.save(invoice);
+        log.info("Invoice recalculated: id={}, medicineFee={}, labFee={}, total={}, paidAmount={}",
+                saved.getId(), medicineFee, labFee, totalAmount, paidAmount);
+
+        // Fetch details for response
+        List<LabTest> labTests = labTestRepository.findByMedicalRecordId(medicalRecordId);
+        List<Prescription> prescriptions = prescriptionRepository.findByMedicalRecordId(medicalRecordId);
+        for (Prescription rx : prescriptions) {
+            List<PrescriptionItem> items = prescriptionItemRepository.findByPrescriptionId(rx.getId());
+            rx.setPrescriptionItems(items);
+        }
+        return InvoiceMapper.toResponseWithDetails(saved, labTests, prescriptions);
+    }
+
     // ── T44: XUẤT HOÁ ĐƠN PDF ────────────────────────────────────────────────────
 
     @Override
     @Transactional(readOnly = true)
+    @Auditable(action = "EXPORT_PDF", entityType = "Invoice")
     public byte[] exportInvoiceToPdf(Long invoiceId) {
         Invoice invoice = findInvoice(invoiceId);
         InvoiceResponse data = InvoiceMapper.toResponse(invoice);

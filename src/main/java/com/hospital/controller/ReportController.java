@@ -84,7 +84,7 @@ public class ReportController {
         LocalDate today = LocalDate.now();
         LocalDate firstOfMonth = today.withDayOfMonth(1);
         return ResponseEntity.ok(
-                ApiResponse.ok("Bao cao doanh thu thang nay",
+                ApiResponse.ok("Báo cáo doanh thu tháng nay",
                         reportService.getRevenueReport(firstOfMonth, today)));
     }
 

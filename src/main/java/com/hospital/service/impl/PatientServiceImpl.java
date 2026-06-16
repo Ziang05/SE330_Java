@@ -68,7 +68,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     @Transactional(readOnly = true)
     public List<PatientResponse> searchByName(String keyword) {
-        return patientRepository.findByFullNameContainingIgnoreCase(keyword).stream()
+        return patientRepository.searchByKeyword(keyword).stream()
                 .map(PatientMapper::toResponse)
                 .toList();
     }

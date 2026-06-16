@@ -5,5 +5,6 @@ package com.hospital.entity.enums;
  */
 public enum PrescriptionStatus {
     DRAFT,
-    ISSUED
+    ISSUED,
+    COMPLETED
 }

@@ -15,6 +15,7 @@ import com.hospital.repository.MedicineRepository;
 import com.hospital.repository.PrescriptionRepository;
 import com.hospital.repository.PrescriptionItemRepository;
 import com.hospital.service.PrescriptionService;
+import com.hospital.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     private final MedicineRepository medicineRepository;
     private final PrescriptionRepository prescriptionRepository;
     private final PrescriptionItemRepository prescriptionItemRepository;
+    private final PaymentService paymentService;
 
     @Override
     @Transactional
@@ -70,6 +72,14 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
             PrescriptionItem savedItem = prescriptionItemRepository.save(item);
             savedItems.add(savedItem);
+        }
+
+        // Auto-recalculate PENDING invoice (if exists) to reflect new prescription fees
+        try {
+            paymentService.recalculateInvoice(medicalRecord.getId());
+            log.info("Auto-recalculated invoice for MedicalRecord ID: {}", medicalRecord.getId());
+        } catch (Exception e) {
+            log.debug("No PENDING invoice to recalculate for MR {}: {}", medicalRecord.getId(), e.getMessage());
         }
 
         return mapToResponse(savedPrescription, savedItems);

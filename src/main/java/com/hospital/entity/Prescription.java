@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Prescription header issued from a medical record.
@@ -32,4 +33,7 @@ public class Prescription extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private PrescriptionStatus status = PrescriptionStatus.DRAFT;
+
+    @OneToMany(mappedBy = "prescription", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<PrescriptionItem> prescriptionItems;
 }

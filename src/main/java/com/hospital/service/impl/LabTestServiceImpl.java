@@ -12,6 +12,7 @@ import com.hospital.exception.ResourceNotFoundException;
 import com.hospital.repository.MedicalRecordRepository;
 import com.hospital.repository.LabTestRepository;
 import com.hospital.service.LabTestService;
+import com.hospital.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,6 +38,7 @@ public class LabTestServiceImpl implements LabTestService {
 
     private final MedicalRecordRepository medicalRecordRepository;
     private final LabTestRepository labTestRepository;
+    private final PaymentService paymentService;
 
     private final String UPLOAD_DIR = "uploads/";
 
@@ -53,9 +56,18 @@ public class LabTestServiceImpl implements LabTestService {
         labTest.setTestType(request.getTestName());
         labTest.setOrderedBy(medicalRecord.getDoctor());
         labTest.setStatus(LabTestStatus.ORDERED);
+        labTest.setFee(request.getFee() != null ? request.getFee() : BigDecimal.ZERO);
 
         LabTest savedTest = labTestRepository.save(labTest);
         log.info("Đã tạo phiếu xét nghiệm thành công. LabTest ID: {}", savedTest.getId());
+
+        // Auto-recalculate PENDING invoice (if exists) to reflect new lab test fee
+        try {
+            paymentService.recalculateInvoice(medicalRecord.getId());
+            log.info("Auto-recalculated invoice for MedicalRecord ID: {}", medicalRecord.getId());
+        } catch (Exception e) {
+            log.debug("No PENDING invoice to recalculate for MR {}: {}", medicalRecord.getId(), e.getMessage());
+        }
 
         return mapToResponse(savedTest);
     }

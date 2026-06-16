@@ -52,4 +52,13 @@ public interface PaymentService {
      * @return mảng byte của file .pdf
      */
     byte[] exportInvoiceToPdf(Long invoiceId);
+
+    /**
+     * Tính lại hóa đơn PENDING sau khi bác sĩ đã thêm/xóa prescription hoặc lab test.
+     * Chỉ cho phép khi hóa đơn đang ở trạng thái PENDING.
+     *
+     * @param medicalRecordId ID hồ sơ khám có hóa đơn cần tính lại
+     * @return hóa đơn sau khi cập nhật phí
+     */
+    InvoiceResponse recalculateInvoice(Long medicalRecordId);
 }

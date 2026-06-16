@@ -51,4 +51,15 @@ public class MedicalRecordController {
         java.util.List<MedicalRecordResponse> response = medicalRecordService.getMedicalRecordsByPatientId(patientId);
         return ApiResponse.ok("Tai danh sach ho so kham thanh cong.", response);
     }
+
+    /**
+     * API lay chi tiet mot ho so kham theo ID.
+     */
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE')")
+    public ApiResponse<MedicalRecordResponse> getById(@PathVariable Long id) {
+        log.info("REST request - Lay ho so kham ID: {}", id);
+        MedicalRecordResponse response = medicalRecordService.getById(id);
+        return ApiResponse.ok("Tai ho so kham thanh cong.", response);
+    }
 }

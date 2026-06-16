@@ -19,6 +19,7 @@ import java.util.List;
  * <pre>
  *   POST /api/v1/invoices/medical-records/{medicalRecordId} – T40: auto-tạo hóa đơn sau khám
  *   POST /api/v1/invoices/pay                               – T39: xác nhận thanh toán
+ *   PUT  /api/v1/invoices/medical-records/{id}/recalculate   – tính lại hóa đơn PENDING
  *   GET  /api/v1/invoices/{id}                              – lấy chi tiết hóa đơn
  *   GET  /api/v1/invoices/patient/{patientId}               – lịch sử hóa đơn bệnh nhân
  *   GET  /api/v1/invoices/{id}/export                       – T44: xuất hóa đơn PDF
@@ -54,6 +55,19 @@ public class PaymentController {
     ) {
         return ResponseEntity.ok(
                 ApiResponse.ok("Thanh toan thanh cong", paymentService.processPayment(request)));
+    }
+
+    /**
+     * Tính lại hóa đơn PENDING sau khi bác sĩ đã thêm/xóa prescription hoặc lab test.
+     */
+    @PutMapping("/medical-records/{medicalRecordId}/recalculate")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR', 'CASHIER')")
+    public ResponseEntity<ApiResponse<InvoiceResponse>> recalculateInvoice(
+            @PathVariable Long medicalRecordId
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.ok("Tinh lai hoa don thanh cong",
+                        paymentService.recalculateInvoice(medicalRecordId)));
     }
 
     /**

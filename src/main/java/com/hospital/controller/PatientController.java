@@ -4,13 +4,18 @@ import com.hospital.dto.request.PatientRequest;
 import com.hospital.dto.response.ApiResponse;
 import com.hospital.dto.response.PatientResponse;
 import com.hospital.service.PatientService;
+import com.hospital.util.PatientExcelUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 /**
@@ -62,5 +67,25 @@ public class PatientController {
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         patientService.delete(id);
         return ResponseEntity.ok(ApiResponse.ok("Patient deleted successfully", null));
+    }
+
+    @GetMapping("/export")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
+    public ResponseEntity<InputStreamResource> exportPatients(@RequestParam(required = false) String keyword) {
+        List<PatientResponse> patients;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            patients = patientService.searchByName(keyword);
+        } else {
+            patients = patientService.getAll();
+        }
+
+        ByteArrayInputStream excelFile = PatientExcelUtil.exportToExcel(patients);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=patients_export.xlsx");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(new InputStreamResource(excelFile));
     }
 }

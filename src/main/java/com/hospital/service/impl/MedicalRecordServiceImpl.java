@@ -4,19 +4,31 @@ import com.hospital.audit.Auditable;
 import com.hospital.dto.request.CheckInRequest;
 import com.hospital.dto.response.MedicalRecordResponse;
 import com.hospital.entity.Appointment;
+import com.hospital.entity.Invoice;
+import com.hospital.entity.LabTest;
 import com.hospital.entity.MedicalRecord;
+import com.hospital.entity.Prescription;
+import com.hospital.entity.PrescriptionItem;
 import com.hospital.entity.enums.AppointmentStatus;
 import com.hospital.exception.BusinessException;
 import com.hospital.exception.ResourceNotFoundException;
 import com.hospital.repository.AppointmentRepository;
+import com.hospital.repository.InvoiceRepository;
+import com.hospital.repository.LabTestRepository;
 import com.hospital.repository.MedicalRecordRepository;
+import com.hospital.repository.PrescriptionItemRepository;
+import com.hospital.repository.PrescriptionRepository;
 import com.hospital.service.MedicalRecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Class xử lý logic nghiệp vụ Tiếp nhận bệnh nhân tại quầy (Check-in).
@@ -28,6 +40,10 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     private final AppointmentRepository appointmentRepository;
     private final MedicalRecordRepository medicalRecordRepository;
+    private final LabTestRepository labTestRepository;
+    private final PrescriptionRepository prescriptionRepository;
+    private final PrescriptionItemRepository prescriptionItemRepository;
+    private final InvoiceRepository invoiceRepository;
 
     @Override
     @Transactional
@@ -79,6 +95,74 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         return records.stream().map(this::mapToResponse).collect(java.util.stream.Collectors.toList());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public MedicalRecordResponse getById(Long id) {
+        log.info("Lay ho so kham theo ID: {}", id);
+        MedicalRecord record = medicalRecordRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("MedicalRecord", "id", id));
+
+        MedicalRecordResponse response = mapToResponse(record);
+
+        // Populate lab tests
+        List<LabTest> labTests = labTestRepository.findByMedicalRecordId(id);
+        List<MedicalRecordResponse.LabTestSummary> labSummaries = new ArrayList<>();
+        for (LabTest lt : labTests) {
+            labSummaries.add(new MedicalRecordResponse.LabTestSummary(
+                    lt.getId(),
+                    lt.getTestType(),
+                    null,
+                    lt.getFee(),
+                    lt.getStatus() != null ? lt.getStatus().name() : null,
+                    lt.getResult()
+            ));
+        }
+        response.setLabTests(labSummaries);
+
+        // Populate prescriptions
+        List<Prescription> prescriptions = prescriptionRepository.findByMedicalRecordId(id);
+        List<MedicalRecordResponse.PrescriptionSummary> rxSummaries = new ArrayList<>();
+        for (Prescription rx : prescriptions) {
+            List<MedicalRecordResponse.MedicineItem> items = new ArrayList<>();
+            List<PrescriptionItem> rxItems = prescriptionItemRepository.findByPrescriptionId(rx.getId());
+            for (PrescriptionItem pi : rxItems) {
+                BigDecimal subtotal = pi.getUnitPriceAtTime().multiply(BigDecimal.valueOf(pi.getQuantity()));
+                items.add(new MedicalRecordResponse.MedicineItem(
+                        pi.getId(),
+                        pi.getMedicine() != null ? pi.getMedicine().getMedicineName() : null,
+                        pi.getQuantity(),
+                        pi.getMedicine() != null ? pi.getMedicine().getUnit() : null,
+                        pi.getDosage(),
+                        pi.getUnitPriceAtTime(),
+                        subtotal
+                ));
+            }
+            rxSummaries.add(new MedicalRecordResponse.PrescriptionSummary(
+                    rx.getId(),
+                    rx.getDoctor() != null ? rx.getDoctor().getFullName() : null,
+                    rx.getIssuedDate(),
+                    rx.getStatus() != null ? rx.getStatus().name() : null,
+                    items
+            ));
+        }
+        response.setPrescriptions(rxSummaries);
+
+        // Populate invoice (if exists)
+        Optional<Invoice> invoiceOpt = invoiceRepository.findByMedicalRecordId(id);
+        invoiceOpt.ifPresent(inv -> response.setInvoice(new MedicalRecordResponse.InvoiceSummary(
+                inv.getId(),
+                inv.getExaminationFee(),
+                inv.getMedicineFee(),
+                inv.getLabFee(),
+                inv.getTotalAmount(),
+                inv.getInsuranceAmount(),
+                inv.getPaidAmount(),
+                inv.getStatus() != null ? inv.getStatus().name() : null
+        )));
+
+        return response;
+    }
+
     /**
      * Ham helper phang hoa du lieu tu Entity sang DTO Response.
      */
@@ -95,6 +179,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
             response.setPatientId(record.getPatient().getId());
             response.setPatientName(record.getPatient().getFullName());
             response.setPatientPhone(record.getPatient().getPhone());
+            response.setPatientInsuranceNumber(record.getPatient().getInsuranceNumber());
         }
 
         if (record.getDoctor() != null) {

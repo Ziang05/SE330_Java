@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Response DTO for an invoice, returned to client after create or payment.
@@ -45,4 +46,36 @@ public class InvoiceResponse {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // ── Chi tiết các mục đã tính phí ──────────────────────────────────────────────
+    private List<LabTestLineItem> labTests;
+    private List<PrescriptionLineItem> prescriptions;
+
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor
+    public static class LabTestLineItem {
+        private Long id;
+        private String testName;
+        private String description;
+        private BigDecimal fee;
+        private String status;
+    }
+
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor
+    public static class PrescriptionLineItem {
+        private Long prescriptionId;
+        private String doctorName;
+        private String doctorNotes;
+        private List<MedicineLineItem> medicines;
+    }
+
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor
+    public static class MedicineLineItem {
+        private Long id;
+        private String medicationName;
+        private Integer quantity;
+        private String unit;
+        private String dosage;
+        private BigDecimal unitPrice;
+        private BigDecimal subtotal;
+    }
 }
