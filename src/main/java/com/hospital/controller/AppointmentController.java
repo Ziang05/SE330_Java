@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -140,5 +141,23 @@ public class AppointmentController {
                 .headers(headers)
                 .contentType(MediaType.APPLICATION_PDF) // Khai báo định dạng file trả về là PDF
                 .body(resource);
+    }
+
+    @PostMapping("/patient")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('PATIENT')")
+    public ApiResponse<AppointmentResponse> createByPatient(
+            @Valid @RequestBody PatientAppointmentRequest request,
+            Authentication authentication) {
+        
+        String currentUsername = authentication.getName();
+        
+        AppointmentResponse data = appointmentService.createAppointmentByPatient(request, currentUsername);
+        
+        return ApiResponse.<AppointmentResponse>builder()
+                .code(HttpStatus.CREATED.value())
+                .message("Đăng ký lịch hẹn thành công! Lịch hẹn đang chờ duyệt.")
+                .data(data)
+                .build();
     }
 }

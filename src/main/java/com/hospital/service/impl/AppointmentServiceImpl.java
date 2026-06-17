@@ -188,4 +188,32 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         return PdfGeneratorUtil.generateAppointmentSlip(appointment);
     }
+
+    @Override
+    @Transactional
+    @Auditable(action = "PATIENT_SELF_CREATE", entityType = "Appointment")
+    public AppointmentResponse createAppointmentByPatient(PatientAppointmentRequest request, String username) {
+        log.info("Bệnh nhân {} đang tiến hành tự đặt lịch hẹn khám", username);
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        Patient patient = patientRepository.findByUser(user)
+                .orElseThrow(() -> new BusinessException("Tài khoản của bạn chưa được liên kết với hồ sơ bệnh nhân nào trên hệ thống"));
+
+        Doctor doctor = doctorRepository.findById(request.getDoctorId())
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", request.getDoctorId()));
+
+        Appointment appointment = new Appointment();
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setAppointmentDate(request.getAppointmentDate());
+        appointment.setReason(request.getReason());
+        appointment.setStatus(AppointmentStatus.PENDING);
+
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+        log.info("Lịch hẹn ID {} được tạo thành công bởi Bệnh nhân dưới trạng thái PENDING", savedAppointment.getId());
+
+        return MapperUtil.toAppointmentResponse(savedAppointment);
+    }
 }

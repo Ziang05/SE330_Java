@@ -18,6 +18,8 @@ public interface AppointmentService {
 
     AppointmentResponse updateAppointmentStatus(Long id, AppointmentStatus status);
 
+    AppointmentResponse createAppointmentByPatient(PatientAppointmentRequest request, String username);
+
     boolean isDoctorConflicted(Long doctorId, java.time.LocalDateTime apptDatetime);
 
     ByteArrayInputStream exportAppointmentSlipPdf(Long id);
