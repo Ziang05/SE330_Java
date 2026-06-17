@@ -654,6 +654,7 @@ CREATE TABLE IF NOT EXISTS users
 ) NOT NULL,
     is_active BIT NOT NULL,
     doctor_id BIGINT,
+    patient_id BIGINT,
     created_at DATETIME
 (
     6
@@ -673,6 +674,13 @@ CREATE TABLE IF NOT EXISTS users
 (
     id
 ),
+    CONSTRAINT fk_users_patient FOREIGN KEY
+(
+    patient_id
+) REFERENCES patients
+(
+    id
+),
     INDEX idx_users_username
 (
     username
@@ -680,6 +688,10 @@ CREATE TABLE IF NOT EXISTS users
     INDEX idx_users_doctor_id
 (
     doctor_id
+),
+    INDEX idx_users_patient_id
+(
+    patient_id
 )
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_unicode_ci;
 

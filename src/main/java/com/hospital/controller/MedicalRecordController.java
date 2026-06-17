@@ -31,7 +31,7 @@ public class MedicalRecordController {
      * Ch峄� ADMIN ho岷穋 NURSE m峄沬 c贸 quy峄乶 ti岷縫 膽贸n b峄噉h nh芒n.
      */
     @PostMapping("/check-in")
-    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR')")
     public ApiResponse<MedicalRecordResponse> checkInPatient(@Valid @RequestBody CheckInRequest request) {
         log.info("REST request - Ti岷縫 nh岷璶 b峄噉h nh芒n cho Appointment ID: {}", request.getAppointmentId());
         

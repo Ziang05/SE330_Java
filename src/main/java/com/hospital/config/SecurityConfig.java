@@ -53,8 +53,19 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler()))
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/refresh").permitAll()
+                        // Public auth endpoints
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/refresh",
+                                "/api/auth/register-patient").permitAll()
                         .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+
+                        // PATIENT-only area (future appointment & invoice APIs will live here)
+                        .requestMatchers("/api/patient/**").hasRole("PATIENT")
+
+                        // Staff-only areas – PATIENT is implicitly denied (no matching role)
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+
+                        // All other requests require authentication (role enforcement via @PreAuthorize)
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -11,6 +11,7 @@ import com.hospital.exception.BusinessException;
 import com.hospital.exception.DuplicateResourceException;
 import com.hospital.exception.ResourceNotFoundException;
 import com.hospital.repository.DoctorRepository;
+import com.hospital.repository.PatientRepository;
 import com.hospital.repository.RoleRepository;
 import com.hospital.repository.UserRepository;
 import com.hospital.repository.UserRoleRepository;
@@ -38,6 +39,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
     private final DoctorRepository doctorRepository;
+    private final PatientRepository patientRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -191,6 +193,17 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", doctorId));
     }
 
+    private com.hospital.entity.Patient resolvePatient(Long patientId, List<Role> roles) {
+        if (patientId == null) {
+            return null;
+        }
+        if (!hasRole(roles, RoleName.PATIENT)) {
+            throw new BusinessException("patientId chỉ được điền khi role là PATIENT");
+        }
+        return patientRepository.findById(patientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", patientId));
+    }
+
     private boolean hasRole(List<Role> roles, RoleName roleName) {
         return roles.stream().anyMatch(role -> role.getRoleName() == roleName);
     }
@@ -217,6 +230,7 @@ public class UserServiceImpl implements UserService {
 
     private UserResponse toResponse(User user, List<Role> roles) {
         Long doctorId = user.getDoctor() == null ? null : user.getDoctor().getId();
+        Long patientId = user.getPatient() == null ? null : user.getPatient().getId();
         return new UserResponse(
                 user.getId(),
                 user.getUsername(),
@@ -225,6 +239,7 @@ public class UserServiceImpl implements UserService {
                 user.getIsActive(),
                 roles.stream().map(role -> role.getRoleName().name()).toList(),
                 doctorId,
+                patientId,
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );

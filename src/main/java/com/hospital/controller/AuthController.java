@@ -3,10 +3,13 @@ package com.hospital.controller;
 import com.hospital.config.JwtProperties;
 import com.hospital.dto.request.LoginRequest;
 import com.hospital.dto.request.RefreshTokenRequest;
+import com.hospital.dto.request.RegisterPatientRequest;
 import com.hospital.dto.response.ApiResponse;
 import com.hospital.dto.response.LoginResponse;
+import com.hospital.dto.response.RegisterPatientResponse;
 import com.hospital.security.JwtTokenProvider;
 import com.hospital.security.UserPrincipal;
+import com.hospital.service.AuthService;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtProperties jwtProperties;
     private final UserDetailsService userDetailsService;
+    private final AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
@@ -58,6 +62,14 @@ public class AuthController {
         String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
         UserPrincipal principal = (UserPrincipal) userDetailsService.loadUserByUsername(username);
         return ResponseEntity.ok(ApiResponse.ok(buildLoginResponse(principal, refreshToken)));
+    }
+
+    @PostMapping("/register-patient")
+    public ResponseEntity<ApiResponse<RegisterPatientResponse>> registerPatient(
+            @Valid @RequestBody RegisterPatientRequest request) {
+        RegisterPatientResponse response = authService.registerPatient(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok("Đăng ký tài khoản bệnh nhân thành công", response));
     }
 
     @PostMapping("/logout")

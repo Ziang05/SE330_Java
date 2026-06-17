@@ -27,6 +27,7 @@ public class JwtTokenProvider {
                 .claim("userId", principal.getId())
                 .claim("username", principal.getUsername())
                 .claim("roles", principal.getRoles())
+                .claim("patientId", principal.getPatientId())
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey(), Jwts.SIG.HS256)

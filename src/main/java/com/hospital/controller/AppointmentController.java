@@ -62,7 +62,7 @@ public class AppointmentController {
      * Quyền truy cập: ADMIN hoặc NURSE.
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR')")
     public ApiResponse<List<AppointmentResponse>> getAllAppointments() {
         log.info("REST request - Lấy toàn bộ danh sách lịch hẹn");
         List<AppointmentResponse> response = appointmentService.getAllAppointments();
@@ -75,7 +75,7 @@ public class AppointmentController {
      * Quyền truy cập: ADMIN, DOCTOR, NURSE.
      */
     @GetMapping("/patient/{patientId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE', 'DOCTOR')")
     public ApiResponse<List<AppointmentResponse>> getAppointmentsByPatientId(@PathVariable Long patientId) {
         log.info("REST request - Lấy danh sách lịch hẹn của Patient ID: {}", patientId);
         List<AppointmentResponse> response = appointmentService.getAppointmentsByPatientId(patientId);
@@ -88,7 +88,7 @@ public class AppointmentController {
      * Quyền truy cập: ADMIN hoặc NURSE.
      */
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR')")
     public ApiResponse<AppointmentResponse> updateAppointmentStatus(
             @PathVariable Long id,
             @RequestParam AppointmentStatus status) {
@@ -108,7 +108,7 @@ public class AppointmentController {
     * Dùng cho Frontend check real-time khi bệnh nhân vừa chọn giờ trên lịch.
     */
     @GetMapping("/check-conflict")
-    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'NURSE', 'DOCTOR')")
     public ApiResponse<Boolean> checkConflict(
             @RequestParam Long doctorId,
             @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime apptDatetime) {
@@ -121,7 +121,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/{id}/export-pdf")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE', 'DOCTOR')")
     public ResponseEntity<InputStreamResource> exportAppointmentSlip(@PathVariable Long id) {
         log.info("REST request - Yêu cầu in/xuất PDF cho Lịch hẹn ID: {}", id);
         

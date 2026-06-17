@@ -7,5 +7,6 @@ public enum RoleName {
     ADMIN,
     DOCTOR,
     NURSE,
-    CASHIER
+    CASHIER,
+    PATIENT
 }

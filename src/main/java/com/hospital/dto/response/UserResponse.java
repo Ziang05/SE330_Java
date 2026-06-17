@@ -21,6 +21,7 @@ public class UserResponse {
     private Boolean isActive;
     private List<String> roles;
     private Long doctorId;
+    private Long patientId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

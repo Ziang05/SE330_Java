@@ -77,7 +77,8 @@ INSERT IGNORE INTO roles (id, role_name, created_at, updated_at) VALUES
 (1, 'ADMIN',   @now, @now),
 (2, 'DOCTOR',  @now, @now),
 (3, 'NURSE',   @now, @now),
-(4, 'CASHIER', @now, @now);
+(4, 'CASHIER', @now, @now),
+(5, 'PATIENT', @now, @now);
 
 -- ============================================================================
 -- 5. USERS (7 tài khoản – đủ 4 role, có inactive user để test)

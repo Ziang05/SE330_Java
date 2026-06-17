@@ -17,13 +17,15 @@ public class UserPrincipal implements UserDetails {
     private final Boolean active;
     private final List<String> roles;
     private final List<GrantedAuthority> authorities;
+    private final Long patientId;
 
     private UserPrincipal(
             Long id,
             String username,
             String password,
             Boolean active,
-            List<String> roles
+            List<String> roles,
+            Long patientId
     ) {
         this.id = id;
         this.username = username;
@@ -33,15 +35,18 @@ public class UserPrincipal implements UserDetails {
         this.authorities = roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
+        this.patientId = patientId;
     }
 
     public static UserPrincipal from(User user, List<String> roles) {
+        Long patientId = user.getPatient() == null ? null : user.getPatient().getId();
         return new UserPrincipal(
                 user.getId(),
                 user.getUsername(),
                 user.getPasswordHash(),
                 user.getIsActive(),
-                roles
+                roles,
+                patientId
         );
     }
 
@@ -51,6 +56,10 @@ public class UserPrincipal implements UserDetails {
 
     public List<String> getRoles() {
         return roles;
+    }
+
+    public Long getPatientId() {
+        return patientId;
     }
 
     @Override
