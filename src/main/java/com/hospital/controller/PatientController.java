@@ -3,8 +3,14 @@ package com.hospital.controller;
 import com.hospital.dto.request.PatientRequest;
 import com.hospital.dto.response.ApiResponse;
 import com.hospital.dto.response.PatientResponse;
+import com.hospital.dto.response.SpendingInvoiceItem;
+import com.hospital.dto.response.SpendingSummaryResponse;
+import com.hospital.security.UserPrincipal;
 import com.hospital.service.PatientService;
+import com.hospital.service.PatientSpendingService;
 import com.hospital.util.PatientExcelUtil;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
@@ -16,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -27,6 +34,7 @@ import java.util.List;
 public class PatientController {
 
     private final PatientService patientService;
+    private final PatientSpendingService patientSpendingService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
@@ -67,6 +75,40 @@ public class PatientController {
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         patientService.delete(id);
         return ResponseEntity.ok(ApiResponse.ok("Patient deleted successfully", null));
+    }
+
+    // ── Patient self-service: Thống kê chi tiêu ──────────────────────────────────
+
+    /**
+     * Bệnh nhân xem tổng hợp chi tiêu của chính mình.
+     * patientId được lấy từ JWT token — bệnh nhân không thể xem của người khác.
+     */
+    @GetMapping("/me/spending")
+    @PreAuthorize("hasRole('PATIENT')")
+    public ResponseEntity<ApiResponse<SpendingSummaryResponse>> getMySpending(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            Authentication authentication) {
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        SpendingSummaryResponse summary =
+                patientSpendingService.getSummary(principal.getPatientId(), from, to);
+        return ResponseEntity.ok(ApiResponse.ok(summary));
+    }
+
+    /**
+     * Bệnh nhân xem lịch sử toàn bộ hóa đơn của chính mình (mọi trạng thái).
+     * Mỗi item có flag countedInSpending = true nếu hóa đơn đã PAID.
+     */
+    @GetMapping("/me/invoices")
+    @PreAuthorize("hasRole('PATIENT')")
+    public ResponseEntity<ApiResponse<List<SpendingInvoiceItem>>> getMyInvoices(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            Authentication authentication) {
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        List<SpendingInvoiceItem> items =
+                patientSpendingService.getInvoiceHistory(principal.getPatientId(), from, to);
+        return ResponseEntity.ok(ApiResponse.ok(items));
     }
 
     @GetMapping("/export")

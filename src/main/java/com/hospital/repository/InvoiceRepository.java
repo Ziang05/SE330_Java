@@ -30,6 +30,13 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Invoice> findByPatientIdOrderByCreatedAtDesc(Long patientId);
 
     /**
+     * Lấy hóa đơn theo bệnh nhân trong khoảng thời gian (dùng createdAt).
+     * Dùng cho tính năng thống kê chi tiêu bệnh nhân — trả tất cả trạng thái.
+     */
+    List<Invoice> findByPatientIdAndCreatedAtBetweenOrderByCreatedAtDesc(
+            Long patientId, LocalDateTime from, LocalDateTime to);
+
+    /**
      * Lấy hóa đơn theo trạng thái (PENDING / PAID / CANCELLED).
      */
     List<Invoice> findByStatus(InvoiceStatus status);
