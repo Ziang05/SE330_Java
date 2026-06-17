@@ -23,7 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,6 +53,13 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         Doctor doctor = doctorRepository.findById(request.getDoctorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", request.getDoctorId()));
+
+        if (ChronoUnit.YEARS.between(patient.getDob(), LocalDate.now()) < 16) {
+            if (request.getRepresentativeFullname() == null)
+                throw new BusinessException("Tên người đại diện phải được cung cấp nếu bệnh nhân dưới 16 tuổi");
+            if (request.getRepresentativePhone() == null)
+                throw new BusinessException("Số điện thoại người đại diện phải được cung cấp nếu bệnh nhân dưới 16 tuổi");
+        }
 
         LocalDateTime startRange = request.getApptDatetime().minusMinutes(29);
         LocalDateTime endRange = request.getApptDatetime().plusMinutes(29);

@@ -1,7 +1,6 @@
-package com.hospital.dto.request;
+package com.hospital.controller;
 
-import com.hospital.controller.PatientAppointmentRequest;
-import jakarta.validation.Valid;
+import io.micrometer.common.lang.Nullable;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -11,19 +10,10 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-import io.micrometer.common.lang.Nullable;
-
-/**
- * DTO hứng dữ liệu tạo mới hoặc cập nhật lịch hẹn từ Frontend.
- */
 @Getter
 @Setter
 @NoArgsConstructor
-public class AppointmentRequest {
-
-    @NotNull(message = "ID bệnh nhân không được để trống")
-    private Long patientId;
-
+public class PatientAppointmentRequest {
     @NotNull(message = "ID bác sĩ không được để trống")
     private Long doctorId;
 
@@ -44,16 +34,4 @@ public class AppointmentRequest {
 
     @Size(max = 500, message = "Ghi chú không được vượt quá 500 ký tự")
     private String notes;
-
-    public static AppointmentRequest from(Long patientId, @Valid PatientAppointmentRequest request) {
-        var composed = new AppointmentRequest();
-        composed.setPatientId(patientId);
-        composed.setDoctorId(request.getDoctorId());
-        composed.setApptDatetime(request.getApptDatetime());
-        composed.setEmail(request.getEmail());
-        composed.setRepresentativeFullname(request.getRepresentativeFullname());
-        composed.setRepresentativePhone(request.getRepresentativePhone());
-        composed.setNotes(request.getNotes());
-        return composed;
-    }
 }

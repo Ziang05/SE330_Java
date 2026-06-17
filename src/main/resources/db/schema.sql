@@ -162,6 +162,8 @@ CREATE TABLE IF NOT EXISTS appointments
     BIGINT
     NOT
     NULL,
+    representative_fullname NULLABLE VARCHAR(150),
+    representative_phone NULLABLE VARCHAR(20),
     appt_datetime
     DATETIME
 (

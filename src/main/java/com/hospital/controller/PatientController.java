@@ -1,8 +1,12 @@
 package com.hospital.controller;
 
+import com.hospital.dto.request.AppointmentRequest;
 import com.hospital.dto.request.PatientRequest;
 import com.hospital.dto.response.ApiResponse;
+import com.hospital.dto.response.AppointmentResponse;
 import com.hospital.dto.response.PatientResponse;
+import com.hospital.security.UserPrincipal;
+import com.hospital.service.AppointmentService;
 import com.hospital.service.PatientService;
 import com.hospital.util.PatientExcelUtil;
 import jakarta.validation.Valid;
@@ -13,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
@@ -27,6 +32,7 @@ import java.util.List;
 public class PatientController {
 
     private final PatientService patientService;
+    private final AppointmentService appointmentService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
@@ -87,5 +93,34 @@ public class PatientController {
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(new InputStreamResource(excelFile));
+    }
+
+    @PostMapping("/appointments")
+    @PreAuthorize("hasAnyRole('PATIENT')")
+    public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment(
+            Authentication authentication,
+            @Valid @RequestBody PatientAppointmentRequest request
+    ) {
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        Long patientId = principal.getPatientId();
+        if (patientId == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Unauthorized"));
+
+        AppointmentRequest command = AppointmentRequest.from(patientId, request);
+        AppointmentResponse response = appointmentService.createAppointment(command);
+        return ResponseEntity.ok(ApiResponse.ok("Appointment created successfully", response));
+    }
+
+    @GetMapping("/appointments")
+    @PreAuthorize("hasAnyRole('PATIENT')")
+    public ResponseEntity<ApiResponse<List<AppointmentResponse>>> getAppointments(Authentication authentication) {
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        Long patientId = principal.getPatientId();
+        if (patientId == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Unauthorized"));
+        List<AppointmentResponse> response = appointmentService.getAppointmentsByPatientId(patientId);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 }

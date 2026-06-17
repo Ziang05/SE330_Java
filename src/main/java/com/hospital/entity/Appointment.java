@@ -33,6 +33,12 @@ public class Appointment extends BaseEntity {
     @Column(name = "status", nullable = false, length = 30)
     private AppointmentStatus status = AppointmentStatus.PENDING;
 
+    @Column(name = "representative_fullname", nullable = true, length = 150)
+    private String representativeFullname;
+    
+    @Column(name = "representative_phone", nullable = true, length = 20)
+    private String representativePhone;
+
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 }

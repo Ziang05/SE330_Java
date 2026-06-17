@@ -19,6 +19,8 @@ public class AppointmentMapper {
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
         appointment.setApptDatetime(request.getApptDatetime());
+        appointment.setRepresentativeFullname(request.getRepresentativeFullname());
+        appointment.setRepresentativePhone(request.getRepresentativePhone());
         appointment.setNotes(request.getNotes());
         appointment.setStatus(AppointmentStatus.PENDING); // Trạng thái mặc định khi tạo mới
 
@@ -37,6 +39,8 @@ public class AppointmentMapper {
         response.setNotes(appointment.getNotes());
         response.setCreatedAt(appointment.getCreatedAt());
         response.setUpdatedAt(appointment.getUpdatedAt());
+        response.setRepresentativeFullname(appointment.getRepresentativeFullname());
+        response.setRepresentativePhone(appointment.getRepresentativePhone());
 
         // Bóc tách thông tin Bệnh nhân an toàn
         if (appointment.getPatient() != null) {

@@ -18,6 +18,8 @@ public class AppointmentResponse {
     private Long id;
     private LocalDateTime apptDatetime;
     private AppointmentStatus status;
+    private String representativeFullname;
+    private String representativePhone;
     private String notes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
